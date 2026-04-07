@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Divin Gangbo</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Helvetica Neue',Arial,sans-serif;background:#0a0a0a;color:#f0f0f0;min-height:100vh;}
+nav{display:flex;justify-content:space-between;align-items:center;padding:1.2rem 2.5rem;position:sticky;top:0;background:rgba(10,10,10,0.92);backdrop-filter:blur(8px);border-bottom:0.5px solid #222;z-index:100;}
+.nav-logo{font-size:1.3rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;}
+.nav-links{display:flex;gap:2rem;}
+.nav-links a{color:#aaa;text-decoration:none;font-size:0.85rem;letter-spacing:0.08em;text-transform:uppercase;transition:color 0.2s;}
+.nav-links a:hover{color:#f0f0f0;}
+.nav-manage-btn{background:#f0f0f0;color:#0a0a0a;border:none;padding:0.5rem 1.1rem;font-size:0.8rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border-radius:2px;}
+.nav-manage-btn:hover{background:#ccc;}
+#social-bar{display:flex;justify-content:center;align-items:center;gap:2rem;padding:0.75rem 2.5rem;background:#0f0f0f;border-bottom:0.5px solid #1a1a1a;}
+.social-link{display:flex;align-items:center;gap:0.5rem;color:#777;text-decoration:none;font-size:0.78rem;letter-spacing:0.08em;text-transform:uppercase;transition:color 0.2s;}
+.social-link:hover{color:#f0f0f0;}
+.social-icon{width:16px;height:16px;fill:currentColor;}
+#hero{min-height:88vh;display:flex;align-items:flex-end;padding:4rem 2.5rem;position:relative;overflow:hidden;background:#111;border-bottom:0.5px solid #222;}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);opacity:0.7;}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,10,10,0.9) 0%,transparent 60%);}
+.hero-content{position:relative;z-index:1;max-width:600px;}
+.hero-tag{font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;color:#aaa;margin-bottom:1rem;}
+.hero-name{font-size:clamp(3rem,8vw,6rem);font-weight:700;line-height:0.95;letter-spacing:-0.02em;margin-bottom:1.2rem;}
+.hero-bio{font-size:1rem;color:#aaa;line-height:1.7;max-width:420px;margin-bottom:2rem;}
+.hero-stats{display:flex;gap:2.5rem;flex-wrap:wrap;}
+.stat{display:flex;flex-direction:column;}
+.stat-num{font-size:1.4rem;font-weight:700;}
+.stat-label{font-size:0.72rem;color:#777;letter-spacing:0.1em;text-transform:uppercase;margin-top:0.15rem;}
+.hero-actions{display:flex;gap:1rem;margin-top:2rem;}
+.btn-primary{background:#f0f0f0;color:#0a0a0a;border:none;padding:0.75rem 1.8rem;font-size:0.85rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border-radius:2px;}
+.btn-primary:hover{background:#ccc;}
+.btn-outline{background:transparent;color:#f0f0f0;border:1px solid #444;padding:0.75rem 1.8rem;font-size:0.85rem;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border-radius:2px;}
+.btn-outline:hover{border-color:#f0f0f0;}
+#about{padding:4rem 2.5rem;border-bottom:0.5px solid #1a1a1a;display:grid;grid-template-columns:1fr 1fr;gap:4rem;}
+.about-left h2{font-size:clamp(1.8rem,4vw,3rem);font-weight:700;line-height:1.1;margin-bottom:1.2rem;}
+.about-left p{color:#aaa;line-height:1.7;max-width:400px;}
+.comp-card-info{background:#111;border:0.5px solid #222;border-radius:4px;padding:2rem;}
+.comp-title-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;}
+.comp-title{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:#555;}
+.export-btns{display:flex;gap:0.5rem;}
+.export-btn{background:transparent;color:#aaa;border:0.5px solid #333;padding:0.35rem 0.8rem;font-size:0.72rem;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border-radius:2px;}
+.export-btn:hover{border-color:#aaa;color:#f0f0f0;}
+.comp-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem 2rem;}
+.comp-item{display:flex;flex-direction:column;gap:0.2rem;}
+.comp-label{font-size:0.68rem;color:#555;letter-spacing:0.1em;text-transform:uppercase;}
+.comp-value{font-size:0.95rem;color:#f0f0f0;font-weight:500;}
+.comp-divider{grid-column:1/-1;border:none;border-top:0.5px solid #1f1f1f;}
+#gallery{padding:4rem 2.5rem;}
+.section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;}
+.section-title{font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;color:#666;}
+.filter-bar{display:flex;gap:0.5rem;flex-wrap:wrap;}
+.filter-btn{background:transparent;color:#777;border:0.5px solid #333;padding:0.4rem 1rem;font-size:0.75rem;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;border-radius:2px;}
+.filter-btn:hover{border-color:#666;color:#ccc;}
+.filter-btn.active{background:#f0f0f0;color:#0a0a0a;border-color:#f0f0f0;}
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:3px;}
+.photo-card{position:relative;aspect-ratio:2/3;overflow:hidden;cursor:pointer;background:#1a1a1a;}
+.photo-card.drag-over{outline:2px solid #f0f0f0;opacity:0.7;}
+.photo-card.dragging{opacity:0.3;}
+.photo-card img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s;display:block;pointer-events:none;}
+.photo-card:hover img{transform:scale(1.05);}
+.photo-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.7) 0%,transparent 50%);opacity:0;transition:opacity 0.3s;display:flex;flex-direction:column;justify-content:flex-end;padding:1.2rem;}
+.photo-card:hover .photo-overlay{opacity:1;}
+.photo-title-text{font-size:0.85rem;font-weight:600;}
+.photo-cat{font-size:0.72rem;color:#aaa;letter-spacing:0.08em;text-transform:uppercase;margin-top:0.2rem;}
+.photo-delete{position:absolute;top:0.6rem;right:0.6rem;background:rgba(200,50,50,0.85);color:white;border:none;width:26px;height:26px;border-radius:50%;font-size:0.85rem;cursor:pointer;display:none;align-items:center;justify-content:center;}
+.drag-handle{position:absolute;top:0.6rem;left:0.6rem;background:rgba(0,0,0,0.6);color:#ccc;width:26px;height:26px;border-radius:3px;font-size:1rem;display:none;align-items:center;justify-content:center;cursor:grab;}
+.select-badge{position:absolute;bottom:0.6rem;right:0.6rem;background:rgba(0,0,0,0.7);border:1px solid #444;color:#aaa;width:24px;height:24px;border-radius:50%;font-size:0.75rem;display:none;align-items:center;justify-content:center;cursor:pointer;}
+.select-badge.selected{background:#f0f0f0;color:#0a0a0a;border-color:#f0f0f0;}
+body.manage-mode .photo-delete{display:flex;}
+body.manage-mode .drag-handle{display:flex;}
+body.manage-mode .photo-card{cursor:default;}
+body.compcard-mode .select-badge{display:flex;}
+.photo-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;}
+.placeholder-label{font-size:0.72rem;color:#555;}
+#compcard-builder{padding:4rem 2.5rem;border-top:0.5px solid #1a1a1a;}
+.builder-header{margin-bottom:2.5rem;}
+.builder-header h2{font-size:clamp(1.8rem,4vw,3rem);font-weight:700;line-height:1.1;margin-bottom:0.8rem;}
+.builder-header p{color:#aaa;font-size:0.9rem;line-height:1.7;}
+.builder-layout{display:grid;grid-template-columns:1fr 400px;gap:2rem;align-items:start;}
+.canvas-wrap{background:#1a1a1a;border:0.5px solid #222;border-radius:4px;overflow:hidden;}
+#comp-canvas{display:block;width:100%;background:#fff;}
+.builder-controls{background:#111;border:0.5px solid #222;border-radius:4px;padding:1.5rem;display:flex;flex-direction:column;gap:1.2rem;max-height:90vh;overflow-y:auto;}
+.ctrl-section{display:flex;flex-direction:column;gap:0.6rem;}
+.ctrl-label{font-size:0.7rem;color:#666;letter-spacing:0.1em;text-transform:uppercase;}
+.ctrl-sublabel{font-size:0.68rem;color:#444;margin-top:-0.3rem;}
+.ctrl-input{background:#1a1a1a;border:0.5px solid #333;color:#f0f0f0;padding:0.55rem 0.8rem;font-size:0.85rem;border-radius:2px;width:100%;font-family:inherit;}
+.ctrl-input:focus{outline:none;border-color:#666;}
+.ctrl-select{background:#1a1a1a;border:0.5px solid #333;color:#f0f0f0;padding:0.55rem 0.8rem;font-size:0.85rem;border-radius:2px;width:100%;font-family:inherit;}
+.ctrl-row{display:flex;gap:0.5rem;}
+.ctrl-row .ctrl-input,.ctrl-row .ctrl-select{flex:1;}
+.ctrl-btn{background:#f0f0f0;color:#0a0a0a;border:none;padding:0.7rem;font-size:0.78rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border-radius:2px;width:100%;}
+.ctrl-btn:hover{background:#ccc;}
+.ctrl-btn-outline{background:transparent;color:#f0f0f0;border:0.5px solid #444;padding:0.7rem;font-size:0.78rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border-radius:2px;width:100%;}
+.ctrl-btn-outline:hover{border-color:#aaa;}
+.ctrl-btn-sm{background:transparent;color:#aaa;border:0.5px solid #333;padding:0.45rem 0.8rem;font-size:0.75rem;letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;border-radius:2px;}
+.ctrl-btn-sm:hover{border-color:#aaa;color:#f0f0f0;}
+.ctrl-divider{border:none;border-top:0.5px solid #222;}
+.template-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:0.4rem;}
+.tmpl-btn{aspect-ratio:7/10;background:#1a1a1a;border:1.5px solid transparent;border-radius:2px;cursor:pointer;overflow:hidden;padding:2px;transition:border-color 0.15s;position:relative;}
+.tmpl-btn:hover{border-color:#555;}
+.tmpl-btn.active{border-color:#f0f0f0;}
+.tmpl-preview{width:100%;height:calc(100% - 14px);position:relative;}
+.tmpl-num{font-size:6px;color:#555;text-align:center;margin-top:2px;letter-spacing:0.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tmpl-block{position:absolute;border-radius:1px;}
+.photo-slots{display:flex;flex-direction:column;gap:0.4rem;}
+.photo-slot{display:flex;align-items:center;gap:0.6rem;background:#1a1a1a;border:0.5px solid #2a2a2a;border-radius:3px;padding:0.5rem;cursor:pointer;}
+.photo-slot.active-slot{border-color:#888;}
+.slot-thumb{width:32px;height:46px;object-fit:cover;border-radius:1px;background:#222;flex-shrink:0;}
+.slot-thumb-empty{width:32px;height:46px;background:#1f1f1f;border:0.5px dashed #333;border-radius:1px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:#444;}
+.slot-info{flex:1;}
+.slot-name{font-size:0.75rem;color:#ccc;}
+.slot-role{font-size:0.68rem;color:#555;margin-top:1px;}
+.slot-remove{background:none;border:none;color:#555;cursor:pointer;font-size:1rem;line-height:1;padding:0;}
+.slot-remove:hover{color:#e55;}
+.crop-controls{display:flex;flex-direction:column;gap:0.5rem;}
+.crop-row{display:flex;align-items:center;gap:0.5rem;}
+.crop-lbl{font-size:0.7rem;color:#666;width:52px;flex-shrink:0;}
+.crop-slider{flex:1;height:3px;cursor:pointer;accent-color:#f0f0f0;}
+.crop-val{font-size:0.7rem;color:#555;width:36px;text-align:right;}
+#contact{padding:4rem 2.5rem;border-top:0.5px solid #1a1a1a;}
+.contact-left h2{font-size:clamp(1.8rem,4vw,3rem);font-weight:700;line-height:1.1;margin-bottom:1.2rem;}
+.contact-left p{color:#aaa;line-height:1.7;margin-bottom:2rem;max-width:380px;}
+.contact-item{display:flex;align-items:center;gap:0.8rem;margin-bottom:0.8rem;}
+.contact-dot{width:6px;height:6px;border-radius:50%;background:#f0f0f0;flex-shrink:0;}
+.contact-text{font-size:0.9rem;color:#aaa;}
+#manage-panel{display:none;position:fixed;top:0;right:0;width:340px;height:100vh;background:#111;border-left:0.5px solid #222;z-index:200;flex-direction:column;overflow-y:auto;}
+#manage-panel.open{display:flex;}
+.panel-header{display:flex;justify-content:space-between;align-items:center;padding:1.5rem;border-bottom:0.5px solid #222;}
+.panel-title{font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:600;}
+.panel-close{background:none;border:none;color:#777;font-size:1.4rem;cursor:pointer;}
+.panel-close:hover{color:#f0f0f0;}
+.panel-body{padding:1.5rem;flex:1;display:flex;flex-direction:column;gap:1.2rem;}
+.panel-section{display:flex;flex-direction:column;gap:0.6rem;}
+.panel-label{font-size:0.72rem;color:#777;letter-spacing:0.1em;text-transform:uppercase;}
+.panel-input{background:#1a1a1a;border:0.5px solid #333;color:#f0f0f0;padding:0.65rem 0.9rem;font-size:0.9rem;border-radius:2px;width:100%;font-family:inherit;}
+.panel-input:focus{outline:none;border-color:#666;}
+.panel-select{background:#1a1a1a;border:0.5px solid #333;color:#f0f0f0;padding:0.65rem 0.9rem;font-size:0.9rem;border-radius:2px;width:100%;font-family:inherit;}
+.panel-upload{border:1px dashed #333;border-radius:4px;padding:1.5rem;text-align:center;cursor:pointer;position:relative;}
+.panel-upload:hover{border-color:#666;}
+.panel-upload input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+.upload-icon{font-size:1.8rem;color:#444;margin-bottom:0.5rem;}
+.upload-hint{font-size:0.78rem;color:#555;line-height:1.5;}
+.upload-preview{width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:2px;display:none;}
+.btn-add{background:#f0f0f0;color:#0a0a0a;border:none;padding:0.85rem;font-size:0.82rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border-radius:2px;width:100%;}
+.btn-add:hover{background:#ccc;}
+.panel-divider{border:none;border-top:0.5px solid #222;}
+.panel-info{font-size:0.78rem;color:#555;line-height:1.6;}
+.profile-edit-row{display:flex;gap:0.6rem;}
+.profile-edit-row .panel-input{flex:1;}
+#pw-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:400;align-items:center;justify-content:center;}
+#pw-modal.open{display:flex;}
+.pw-box{background:#111;border:0.5px solid #333;border-radius:4px;padding:2.5rem;width:300px;display:flex;flex-direction:column;gap:1rem;}
+.pw-title{font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:600;}
+.pw-input{background:#1a1a1a;border:0.5px solid #333;color:#f0f0f0;padding:0.75rem 1rem;font-size:0.95rem;border-radius:2px;width:100%;font-family:inherit;}
+.pw-input:focus{outline:none;border-color:#666;}
+.pw-error{font-size:0.78rem;color:#c0392b;display:none;}
+.pw-actions{display:flex;gap:0.6rem;}
+.pw-submit{background:#f0f0f0;color:#0a0a0a;border:none;padding:0.75rem;font-size:0.82rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border-radius:2px;flex:1;}
+.pw-submit:hover{background:#ccc;}
+.pw-cancel{background:transparent;color:#777;border:0.5px solid #333;padding:0.75rem;font-size:0.82rem;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border-radius:2px;flex:1;}
+.pw-cancel:hover{color:#f0f0f0;}
+#manage-banner{display:none;background:#1a1a0a;border-bottom:1px solid #444;padding:0.6rem 2.5rem;font-size:0.78rem;color:#aa9900;letter-spacing:0.06em;}
+body.manage-mode #manage-banner{display:block;}
+#lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:300;align-items:center;justify-content:center;}
+#lightbox.open{display:flex;}
+.lb-img{max-height:90vh;max-width:90vw;object-fit:contain;}
+.lb-close{position:fixed;top:1.5rem;right:1.5rem;background:none;border:none;color:#aaa;font-size:2rem;cursor:pointer;}
+.lb-nav{position:fixed;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.08);border:none;color:#f0f0f0;font-size:1.5rem;cursor:pointer;padding:0.8rem 1rem;border-radius:2px;}
+.lb-nav:hover{background:rgba(255,255,255,0.15);}
+#lb-prev{left:1.5rem;}#lb-next{right:1.5rem;}
+footer{padding:2rem 2.5rem;border-top:0.5px solid #1a1a1a;display:flex;justify-content:space-between;align-items:center;}
+.footer-copy{font-size:0.75rem;color:#555;letter-spacing:0.06em;}
+.footer-links{display:flex;gap:1.5rem;}
+.footer-links a{font-size:0.75rem;color:#555;text-decoration:none;letter-spacing:0.06em;}
+.footer-links a:hover{color:#aaa;}
+@media(max-width:1000px){.builder-layout{grid-template-columns:1fr;}.builder-controls{max-height:none;}}
+@media(max-width:768px){#about{grid-template-columns:1fr;gap:2rem;}.template-grid{grid-template-columns:repeat(5,1fr);}nav,#hero,#gallery,#about,#contact,#compcard-builder,footer{padding-left:1.2rem;padding-right:1.2rem;}#manage-panel{width:100%;}}
+</style>
+</head>
+<body>
+
+<div id="manage-banner">Manage mode active — drag ⠿ to reorder, × to remove, or use the panel to add photos.</div>
+
+<nav>
+  <div class="nav-logo" id="nav-name">Divin Gangbo</div>
+  <div class="nav-links">
+    <a href="#about">About</a><a href="#gallery">Portfolio</a><a href="#contact">Contact</a>
+  </div>
+  <button class="nav-manage-btn" onclick="openPasswordModal()">Manage</button>
+</nav>
+
+<div id="social-bar">
+  <a href="https://instagram.com/Dnice_baby" class="social-link">
+    <svg class="social-icon" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+    @Dnice_baby
+  </a>
+  <a href="mailto:divingangbo@yahoo.fr" class="social-link">
+    <svg class="social-icon" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+    divingangbo@yahoo.fr
+  </a>
+  <a href="https://linkedin.com" class="social-link">
+    <svg class="social-icon" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+    LinkedIn
+  </a>
+</div>
+
+<section id="hero">
+  <div class="hero-bg"></div><div class="hero-overlay"></div>
+  <div class="hero-content">
+    <p class="hero-tag">Model Portfolio</p>
+    <h1 class="hero-name" id="hero-name">Divin<br>Gangbo</h1>
+    <p class="hero-bio" id="hero-bio">Paris-based model available for editorial, commercial, and runway work. Looking for representation by talent agencies across the UK and Europe.</p>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num" id="stat-height">187cm / 6'2"</span><span class="stat-label">Height</span></div>
+      <div class="stat"><span class="stat-num" id="stat-measurements">105 / 86 / 95</span><span class="stat-label">Chest / Waist / Hips</span></div>
+      <div class="stat"><span class="stat-num" id="stat-eyes">Brown</span><span class="stat-label">Eyes</span></div>
+    </div>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="document.getElementById('gallery').scrollIntoView({behavior:'smooth'})">View Portfolio</button>
+      <button class="btn-outline" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Get in Touch</button>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="about-left">
+    <h2>About<br>Divin</h2>
+    <p id="about-bio">Paris-based model available for editorial, commercial, and runway work. Looking for representation by talent agencies across the UK and Europe.</p>
+  </div>
+  <div class="comp-card-info">
+    <div class="comp-title-row">
+      <span class="comp-title">Comp Card</span>
+      <div class="export-btns">
+        <button class="export-btn" onclick="exportInfoCard('pdf')">PDF</button>
+        <button class="export-btn" onclick="exportInfoCard('img')">Image</button>
+      </div>
+    </div>
+    <div class="comp-grid" id="info-comp-card">
+      <div class="comp-item"><span class="comp-label">Name</span><span class="comp-value" id="comp-name">Divin Gangbo</span></div>
+      <div class="comp-item"><span class="comp-label">Based</span><span class="comp-value">Paris, France</span></div>
+      <hr class="comp-divider">
+      <div class="comp-item"><span class="comp-label">Height</span><span class="comp-value" id="comp-height">187cm / 6'2"</span></div>
+      <div class="comp-item"><span class="comp-label">Eyes</span><span class="comp-value" id="comp-eyes">Brown</span></div>
+      <div class="comp-item"><span class="comp-label">Chest</span><span class="comp-value">105cm</span></div>
+      <div class="comp-item"><span class="comp-label">Waist</span><span class="comp-value">86cm</span></div>
+      <div class="comp-item"><span class="comp-label">Hips</span><span class="comp-value">95cm</span></div>
+      <div class="comp-item"><span class="comp-label">Shoe</span><span class="comp-value">EU 44 / US 10 / UK 9.5</span></div>
+      <hr class="comp-divider">
+      <div class="comp-item"><span class="comp-label">Instagram</span><span class="comp-value">@Dnice_baby</span></div>
+      <div class="comp-item"><span class="comp-label">Email</span><span class="comp-value">divingangbo@yahoo.fr</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="gallery">
+  <div class="section-header">
+    <span class="section-title">Portfolio</span>
+    <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap;">
+      <div class="filter-bar" id="filter-bar">
+        <button class="filter-btn active" data-cat="all" onclick="filterGallery('all')">All</button>
+        <button class="filter-btn" data-cat="editorial" onclick="filterGallery('editorial')">Editorial</button>
+        <button class="filter-btn" data-cat="sports" onclick="filterGallery('sports')">Sports</button>
+        <button class="filter-btn" data-cat="casual" onclick="filterGallery('casual')">Casual</button>
+        <button class="filter-btn" data-cat="portrait" onclick="filterGallery('portrait')">Portrait</button>
+      </div>
+      <button id="select-photos-btn" class="ctrl-btn-sm" onclick="toggleSelectMode()">Select for model book</button>
+    </div>
+  </div>
+  <div id="select-hint" style="display:none;font-size:0.78rem;color:#666;margin-bottom:1rem;">Click ✓ on photos to assign them to slots. Selected: <span id="selected-count">0</span></div>
+  <div class="gallery-grid" id="gallery-grid"></div>
+</section>
+
+
+
+<section id="contact">
+  <div class="contact-left">
+    <h2>Get in<br>Touch</h2>
+    <p>Available for editorial shoots, brand campaigns, runway shows, and commercial projects. Based in Paris with international travel available.</p>
+    <div class="contact-item"><div class="contact-dot"></div><span class="contact-text">Paris, France</span></div>
+    <div class="contact-item"><div class="contact-dot"></div><span class="contact-text"><a href="mailto:divingangbo@yahoo.fr" style="color:#aaa;text-decoration:none;">divingangbo@yahoo.fr</a></span></div>
+    <div class="contact-item"><div class="contact-dot"></div><span class="contact-text"><a href="https://instagram.com/Dnice_baby" style="color:#aaa;text-decoration:none;">@Dnice_baby</a></span></div>
+    <div class="contact-item"><div class="contact-dot"></div><span class="contact-text">Available for international travel</span></div>
+  </div>
+</section>
+
+<footer>
+  <span class="footer-copy" id="footer-copy">© 2025 Divin Gangbo. All rights reserved.</span>
+  <div class="footer-links"><a href="https://instagram.com/Dnice_baby">Instagram</a><a href="#">Press</a></div>
+</footer>
+
+<div id="pw-modal">
+  <div class="pw-box">
+    <div class="pw-title">Admin access</div>
+    <p style="font-size:0.82rem;color:#666;line-height:1.6;">Enter the password to manage the portfolio.</p>
+    <input class="pw-input" type="password" id="pw-input" placeholder="Password" onkeydown="if(event.key==='Enter')checkPassword()">
+    <div class="pw-error" id="pw-error">Incorrect password.</div>
+    <div class="pw-actions">
+      <button class="pw-cancel" onclick="closePasswordModal()">Cancel</button>
+      <button class="pw-submit" onclick="checkPassword()">Enter</button>
+    </div>
+  </div>
+</div>
+
+<div id="manage-panel">
+  <div class="panel-header">
+    <span class="panel-title">Manage Portfolio</span>
+    <button class="panel-close" onclick="toggleManage()">×</button>
+  </div>
+  <div class="panel-body">
+    <div class="panel-section">
+      <span class="panel-label">Profile details</span>
+      <input class="panel-input" id="edit-name" value="Divin Gangbo">
+      <textarea class="panel-input" id="edit-bio" rows="3" style="resize:vertical;">Paris-based model available for editorial, commercial, and runway work. Looking for representation by talent agencies across the UK and Europe.</textarea>
+      <div class="profile-edit-row">
+        <input class="panel-input" id="edit-height" value="187cm / 6'2&quot;">
+        <input class="panel-input" id="edit-measurements" value="105 / 86 / 95">
+        <input class="panel-input" id="edit-eyes" value="Brown">
+      </div>
+      <input class="panel-input" id="edit-email" value="divingangbo@yahoo.fr">
+      <button class="btn-add" onclick="saveProfile()">Save profile</button>
+    </div>
+    <hr class="panel-divider">
+    <div class="panel-section">
+      <span class="panel-label">Change password</span>
+      <input class="panel-input" id="new-pw" type="password" placeholder="New password">
+      <button class="btn-add" onclick="changePassword()">Update password</button>
+    </div>
+    <hr class="panel-divider">
+    <div class="panel-section">
+      <span class="panel-label">Add photo</span>
+      <div class="panel-upload" id="upload-zone">
+        <input type="file" accept="image/*" onchange="previewUpload(event)">
+        <div class="upload-icon">↑</div>
+        <div class="upload-hint">Click to select image</div>
+        <img class="upload-preview" id="upload-preview" alt="">
+      </div>
+      <input class="panel-input" id="photo-title" placeholder="Photo title">
+      <select class="panel-select" id="photo-cat">
+        <option value="editorial">Editorial</option>
+        <option value="sports">Sports</option>
+        <option value="casual">Casual</option>
+        <option value="portrait">Portrait</option>
+      </select>
+      <button class="btn-add" onclick="addPhoto()">+ Add to portfolio</button>
+    </div>
+    <hr class="panel-divider">
+    <p class="panel-info">Drag ⠿ to reorder photos. × to remove. Changes apply instantly.</p>
+  </div>
+</div>
+
+<div id="lightbox" onclick="closeLightbox()">
+  <button class="lb-close" onclick="closeLightbox()">×</button>
+  <button class="lb-nav" id="lb-prev" onclick="event.stopPropagation();lightboxNav(-1)">‹</button>
+  <img class="lb-img" id="lb-img" src="" alt="">
+  <button class="lb-nav" id="lb-next" onclick="event.stopPropagation();lightboxNav(1)">›</button>
+</div>
+
+<script>
+// ─── CONSTANTS ────────────────────────────────────────────────
+var SLOT_ROLES = [
+  {key:'headshot', label:'Headshot', tc:'#7ab'},
+  {key:'fullbody', label:'Full Body', tc:'#7b7'},
+  {key:'bw',       label:'B&W',       tc:'#999'},
+  {key:'extra1',   label:'Extra 1',   tc:'#a8a'},
+  {key:'extra2',   label:'Extra 2',   tc:'#ba9'}
+];
+var PLACEHOLDER_COLORS = ['#1a2a3a','#2a1a3a','#1a3a2a','#3a1a1a','#2a3a1a','#1a1a3a','#3a2a1a','#2a3a3a'];
+var CW = 600, CH = 900;
+
+// ─── STATE ────────────────────────────────────────────────────
+var adminPassword = 'admin123';
+var photos = [
+  {id:1,title:'Editorial 1',cat:'editorial',src:null},
+  {id:2,title:'Editorial 2',cat:'editorial',src:null},
+  {id:3,title:'Editorial 3',cat:'editorial',src:null},
+  {id:4,title:'Editorial 4',cat:'editorial',src:null},
+  {id:5,title:'Editorial 5',cat:'editorial',src:null},
+  {id:6,title:'Editorial 6',cat:'editorial',src:null},
+  {id:7,title:'Editorial 7',cat:'editorial',src:null},
+  {id:8,title:'Editorial 8',cat:'editorial',src:null},
+  {id:9,title:'Editorial 9',cat:'editorial',src:null},
+  {id:10,title:'Editorial 10',cat:'editorial',src:null},
+  {id:11,title:'Sports 1',cat:'sports',src:null},
+  {id:12,title:'Sports 2',cat:'sports',src:null},
+  {id:13,title:'Sports 3',cat:'sports',src:null},
+  {id:14,title:'Sports 4',cat:'sports',src:null},
+  {id:15,title:'Sports 5',cat:'sports',src:null},
+  {id:16,title:'Sports 6',cat:'sports',src:null},
+  {id:17,title:'Sports 7',cat:'sports',src:null},
+  {id:18,title:'Sports 8',cat:'sports',src:null},
+  {id:19,title:'Sports 9',cat:'sports',src:null},
+  {id:20,title:'Sports 10',cat:'sports',src:null},
+  {id:21,title:'Casual 1',cat:'casual',src:null},
+  {id:22,title:'Casual 2',cat:'casual',src:null},
+  {id:23,title:'Casual 3',cat:'casual',src:null},
+  {id:24,title:'Casual 4',cat:'casual',src:null},
+  {id:25,title:'Casual 5',cat:'casual',src:null},
+  {id:26,title:'Casual 6',cat:'casual',src:null},
+  {id:27,title:'Casual 7',cat:'casual',src:null},
+  {id:28,title:'Casual 8',cat:'casual',src:null},
+  {id:29,title:'Casual 9',cat:'casual',src:null},
+  {id:30,title:'Casual 10',cat:'casual',src:null},
+  {id:31,title:'Portrait 1',cat:'portrait',src:null},
+  {id:32,title:'Portrait 2',cat:'portrait',src:null},
+  {id:33,title:'Portrait 3',cat:'portrait',src:null},
+  {id:34,title:'Portrait 4',cat:'portrait',src:null},
+  {id:35,title:'Portrait 5',cat:'portrait',src:null},
+  {id:36,title:'Portrait 6',cat:'portrait',src:null},
+  {id:37,title:'Portrait 7',cat:'portrait',src:null},
+  {id:38,title:'Portrait 8',cat:'portrait',src:null},
+  {id:39,title:'Portrait 9',cat:'portrait',src:null},
+  {id:40,title:'Portrait 10',cat:'portrait',src:null}
+];
+var nextId = 41;
+var currentFilter = 'all';
+var currentLightboxIndex = 0;
+var dragSrcId = null;
+var uploadedSrc = null;
+var selectMode = false;
+var ccSlots = SLOT_ROLES.map(function(r){ return {photoId:null,src:null,offsetX:0,offsetY:0,scale:1,role:r.key}; });
+var activeSlotIdx = null;
+var currentTemplate = 0;
+
+
+
+// ─── GALLERY ──────────────────────────────────────────────────
+function getVisible(){ return currentFilter==='all' ? photos : photos.filter(function(p){ return p.cat===currentFilter; }); }
+
+function renderGallery(){
+  var grid = document.getElementById('gallery-grid');
+  grid.innerHTML = '';
+  var visible = getVisible();
+  if(!visible.length){ grid.innerHTML='<p style="color:#555;font-size:0.85rem;padding:2rem 0;">No photos yet.</p>'; return; }
+  visible.forEach(function(p, i){
+    var card = document.createElement('div');
+    card.className = 'photo-card'; card.dataset.id = p.id;
+
+    var handle = document.createElement('div'); handle.className='drag-handle'; handle.innerHTML='⠿';
+    handle.addEventListener('mousedown', function(){ card.draggable=true; });
+
+    var delBtn = document.createElement('button'); delBtn.className='photo-delete'; delBtn.innerHTML='×';
+    delBtn.onclick = function(e){ e.stopPropagation(); deletePhoto(p.id); };
+
+    var selBadge = document.createElement('div'); selBadge.className='select-badge'; selBadge.innerHTML='✓'; selBadge.dataset.id=p.id;
+    if(ccSlots.some(function(s){ return s && s.photoId===p.id; })) selBadge.classList.add('selected');
+    selBadge.onclick = function(e){ e.stopPropagation(); togglePhotoSelect(p.id, selBadge); };
+
+    if(p.src){
+      var img = document.createElement('img'); img.src=p.src; img.alt=p.title; img.loading='lazy';
+      var ov = document.createElement('div'); ov.className='photo-overlay';
+      ov.innerHTML = '<div class="photo-title-text">'+p.title+'</div><div class="photo-cat">'+p.cat+'</div>';
+      card.appendChild(img); card.appendChild(ov);
+      card.addEventListener('click', function(){
+        if(document.body.classList.contains('manage-mode')) return;
+        if(selectMode){ togglePhotoSelect(p.id, selBadge); return; }
+        openLightbox(i);
+      });
+    } else {
+      var ph = document.createElement('div'); ph.className='photo-placeholder'; ph.style.background=PLACEHOLDER_COLORS[p.id%8];
+      ph.innerHTML='<div style="width:40px;height:40px;border-radius:50%;background:#222;display:flex;align-items:center;justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div><span class="placeholder-label">'+p.title+'</span><span class="placeholder-label" style="color:#444;">'+p.cat+'</span>';
+      card.appendChild(ph);
+    }
+    card.appendChild(handle); card.appendChild(delBtn); card.appendChild(selBadge);
+
+    card.addEventListener('dragstart', function(e){ dragSrcId=p.id; card.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; });
+    card.addEventListener('dragend', function(){ card.draggable=false; card.classList.remove('dragging'); document.querySelectorAll('.photo-card').forEach(function(c){ c.classList.remove('drag-over'); }); });
+    card.addEventListener('dragover', function(e){ e.preventDefault(); document.querySelectorAll('.photo-card').forEach(function(c){ c.classList.remove('drag-over'); }); card.classList.add('drag-over'); });
+    card.addEventListener('drop', function(e){
+      e.preventDefault(); if(dragSrcId===p.id) return;
+      var si=photos.findIndex(function(x){ return x.id===dragSrcId; }), ti=photos.findIndex(function(x){ return x.id===p.id; });
+      if(si===-1||ti===-1) return;
+      var moved=photos.splice(si,1)[0]; photos.splice(ti,0,moved); renderGallery();
+    });
+    grid.appendChild(card);
+  });
+}
+
+function filterGallery(cat){
+  currentFilter=cat;
+  document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.cat===cat); });
+  renderGallery();
+}
+function deletePhoto(id){ if(!confirm('Remove this photo?')) return; photos=photos.filter(function(p){ return p.id!==id; }); renderGallery(); }
+
+// ─── SELECT MODE ──────────────────────────────────────────────
+function toggleSelectMode(){
+  selectMode=!selectMode;
+  document.body.classList.toggle('compcard-mode', selectMode);
+  document.getElementById('select-hint').style.display=selectMode?'block':'none';
+  document.getElementById('select-photos-btn').textContent=selectMode?'Done selecting':'Select for model book';
+  renderGallery();
+}
+function enterSelectMode(){ if(!selectMode) toggleSelectMode(); document.getElementById('gallery').scrollIntoView({behavior:'smooth'}); }
+
+function togglePhotoSelect(id, badge){
+  var p=photos.find(function(x){ return x.id===id; });
+  if(!p||!p.src){ alert('Upload a real photo first — placeholders cannot be used.'); return; }
+  var idx=ccSlots.findIndex(function(s){ return s && s.photoId===id; });
+  if(idx!==-1){
+    ccSlots[idx]={photoId:null,src:null,offsetX:0,offsetY:0,scale:1,role:SLOT_ROLES[idx].key};
+    badge.classList.remove('selected');
+  } else {
+    var empty=ccSlots.findIndex(function(s){ return !s.src; });
+    if(empty===-1){ alert('All 5 slots are filled. Remove one first.'); return; }
+    ccSlots[empty]={photoId:id,src:p.src,offsetX:0,offsetY:0,scale:1,role:SLOT_ROLES[empty].key};
+    badge.classList.add('selected');
+  }
+  document.getElementById('selected-count').textContent=ccSlots.filter(function(s){ return s.src; }).length;
+  renderSlotList(); renderCanvas();
+}
+
+// ─── SLOT LIST ────────────────────────────────────────────────
+function renderSlotList(){
+  var c=document.getElementById('photo-slots'); c.innerHTML='';
+  ccSlots.forEach(function(s, i){
+    var role=SLOT_ROLES[i];
+    var row=document.createElement('div');
+    row.className='photo-slot'+(activeSlotIdx===i?' active-slot':'');
+    if(s.src){
+      var thumb=document.createElement('img'); thumb.className='slot-thumb'; thumb.src=s.src; row.appendChild(thumb);
+    } else {
+      var empty=document.createElement('div'); empty.className='slot-thumb-empty'; empty.textContent=i+1; row.appendChild(empty);
+    }
+    var info=document.createElement('div'); info.className='slot-info';
+    info.innerHTML='<div class="slot-name">'+role.label+'</div><div class="slot-role" style="color:'+role.tc+';">'+(s.src?'Photo assigned':'Empty — click to assign')+'</div>';
+    var rm=document.createElement('button'); rm.className='slot-remove'; rm.innerHTML='×';
+    rm.onclick=function(e){
+      e.stopPropagation();
+      ccSlots[i]={photoId:null,src:null,offsetX:0,offsetY:0,scale:1,role:role.key};
+      if(activeSlotIdx===i){ activeSlotIdx=null; renderCropPanel(); }
+      renderSlotList(); renderGallery(); renderCanvas();
+    };
+    row.onclick=function(){ activeSlotIdx=i; renderSlotList(); renderCropPanel(); };
+    row.appendChild(info); row.appendChild(rm); c.appendChild(row);
+  });
+}
+
+// ─── CROP PANEL ───────────────────────────────────────────────
+function renderCropPanel(){
+  var panel=document.getElementById('crop-panel');
+  if(activeSlotIdx===null||!ccSlots[activeSlotIdx]||!ccSlots[activeSlotIdx].src){
+    panel.innerHTML='<p style="font-size:0.75rem;color:#555;">Click a photo slot above to adjust it.</p>'; return;
+  }
+  var s=ccSlots[activeSlotIdx];
+  panel.innerHTML='<div style="font-size:0.72rem;color:#666;margin-bottom:0.5rem;">Adjusting: '+SLOT_ROLES[activeSlotIdx].label+'</div><div class="crop-controls"><div class="crop-row"><span class="crop-lbl">Scale</span><input type="range" class="crop-slider" min="50" max="300" value="'+Math.round(s.scale*100)+'" oninput="updateCrop(\'scale\',this.value/100);document.getElementById(\'cv-sc\').textContent=this.value+\'%\'"><span class="crop-val" id="cv-sc">'+Math.round(s.scale*100)+'%</span></div><div class="crop-row"><span class="crop-lbl">Offset X</span><input type="range" class="crop-slider" min="-200" max="200" value="'+s.offsetX+'" oninput="updateCrop(\'offsetX\',+this.value);document.getElementById(\'cv-ox\').textContent=this.value"><span class="crop-val" id="cv-ox">'+s.offsetX+'</span></div><div class="crop-row"><span class="crop-lbl">Offset Y</span><input type="range" class="crop-slider" min="-200" max="200" value="'+s.offsetY+'" oninput="updateCrop(\'offsetY\',+this.value);document.getElementById(\'cv-oy\').textContent=this.value"><span class="crop-val" id="cv-oy">'+s.offsetY+'</span></div></div>';
+}
+function updateCrop(prop, val){ if(activeSlotIdx===null) return; ccSlots[activeSlotIdx][prop]=val; renderCanvas(); }
+function clearAllSlots(){
+  ccSlots=SLOT_ROLES.map(function(r){ return {photoId:null,src:null,offsetX:0,offsetY:0,scale:1,role:r.key}; });
+  activeSlotIdx=null; renderSlotList(); renderCropPanel(); renderGallery(); renderCanvas();
+}
+
+// ─── TEMPLATE GRID ────────────────────────────────────────────
+function buildTemplateGrid(){
+  var grid=document.getElementById('template-grid');
+  var colors=['#3a3a5a','#2a4a2a','#3a3a3a','#3a2a4a','#4a3a2a'];
+  TEMPLATES.forEach(function(t, i){
+    var btn=document.createElement('button');
+    btn.className='tmpl-btn'+(i===0?' active':''); btn.title=t.name;
+    var prev=document.createElement('div'); prev.className='tmpl-preview';
+    var zones=t.zones();
+    zones.forEach(function(r, j){
+      var blk=document.createElement('div'); blk.className='tmpl-block';
+      blk.style.cssText='left:'+r.x*100+'%;top:'+r.y*100+'%;width:'+r.w*100+'%;height:'+r.h*100+'%;background:'+colors[j%5]+';';
+      prev.appendChild(blk);
+    });
+    var num=document.createElement('div'); num.className='tmpl-num'; num.textContent=t.name;
+    btn.appendChild(prev); btn.appendChild(num);
+    btn.onclick=function(){
+      currentTemplate=i;
+      document.querySelectorAll('.tmpl-btn').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active'); renderCanvas();
+    };
+    grid.appendChild(btn);
+  });
+}
+
+// ─── CANVAS RENDER ────────────────────────────────────────────
+function renderCanvas(){
+  var canvas=document.getElementById('comp-canvas');
+  var ctx=canvas.getContext('2d');
+  var tmpl=TEMPLATES[currentTemplate];
+  var bg=document.getElementById('cc-bg').value;
+  var accent=document.getElementById('cc-accent').value;
+  var nameFont=document.getElementById('cc-name-font').value;
+  var nameSize=parseInt(document.getElementById('cc-name-size').value)||40;
+  var nameColor=document.getElementById('cc-name-color').value;
+  var statsFont=document.getElementById('cc-stats-font').value;
+  var statsSize=parseInt(document.getElementById('cc-stats-size').value)||14;
+  var statsColor=document.getElementById('cc-stats-color').value;
+  var nameText=document.getElementById('cc-name').value;
+  var statsLines=document.getElementById('cc-stats').value.split('\n');
+  var zones=tmpl.zones();
+  var textStartY=tmpl.textY*CH;
+
+  ctx.fillStyle=bg; ctx.fillRect(0,0,CW,CH);
+
+  var imgPromises=zones.map(function(r, i){
+    var slot=ccSlots[i];
+    if(!slot||!slot.src) return Promise.resolve({r:r,img:null,slot:null,i:i});
+    return new Promise(function(res){
+      var img=new Image(); img.crossOrigin='anonymous';
+      img.onload=function(){ res({r:r,img:img,slot:slot,i:i}); };
+      img.onerror=function(){ res({r:r,img:null,slot:null,i:i}); };
+      img.src=slot.src;
+    });
+  });
+
+  Promise.all(imgPromises).then(function(results){
+    ctx.fillStyle=bg; ctx.fillRect(0,0,CW,CH);
+    results.forEach(function(item){
+      var r=item.r, img=item.img, slot=item.slot, i=item.i;
+      var px=Math.round(r.x*CW), py=Math.round(r.y*CH), pw=Math.round(r.w*CW), ph=Math.round(r.h*CH);
+      if(img&&slot){
+        ctx.save(); ctx.beginPath(); ctx.rect(px,py,pw,ph); ctx.clip();
+        var sc=slot.scale, dw=pw*sc, dh=ph*sc;
+        var dx=px+(pw-dw)/2+slot.offsetX, dy=py+(ph-dh)/2+slot.offsetY;
+        if(i===2){
+          var offscreen=document.createElement('canvas'); offscreen.width=CW; offscreen.height=CH;
+          var otx=offscreen.getContext('2d'); otx.drawImage(img,dx,dy,dw,dh);
+          var id=otx.getImageData(px,py,pw,ph), d=id.data;
+          for(var k=0;k<d.length;k+=4){ var gray=0.299*d[k]+0.587*d[k+1]+0.114*d[k+2]; d[k]=d[k+1]=d[k+2]=gray; }
+          otx.putImageData(id,px,py); ctx.drawImage(offscreen,0,0);
+        } else { ctx.drawImage(img,dx,dy,dw,dh); }
+        ctx.restore();
+        var role=SLOT_ROLES[i];
+        ctx.save(); ctx.font='600 9px Helvetica Neue,sans-serif';
+        var lbl=role.label.toUpperCase(), lw=ctx.measureText(lbl).width;
+        ctx.fillStyle='rgba(0,0,0,0.55)'; ctx.fillRect(px+4,py+4,lw+8,14);
+        ctx.fillStyle=role.tc; ctx.fillText(lbl,px+8,py+14); ctx.restore();
+      } else {
+        ctx.fillStyle='#1c1c1c'; ctx.fillRect(px,py,pw,ph);
+        ctx.fillStyle='#2a2a2a'; ctx.fillRect(px+1,py+1,pw-2,ph-2);
+        var role=SLOT_ROLES[i];
+        ctx.font='500 11px Helvetica Neue,sans-serif'; ctx.fillStyle=role.tc;
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(role.label,px+pw/2,py+ph/2);
+        ctx.textAlign='left'; ctx.textBaseline='top';
+      }
+    });
+    ctx.fillStyle=accent; ctx.fillRect(30,textStartY-6,CW-60,1);
+    ctx.font='700 '+nameSize+'px '+nameFont; ctx.fillStyle=nameColor;
+    ctx.textAlign='left'; ctx.textBaseline='top';
+    ctx.fillText(nameText,30,textStartY);
+    ctx.font='400 '+statsSize+'px '+statsFont; ctx.fillStyle=statsColor;
+    statsLines.forEach(function(line, li){ ctx.fillText(line,30,textStartY+nameSize+10+li*(statsSize+5)); });
+  });
+}
+
+// ─── EXPORT ───────────────────────────────────────────────────
+function exportCanvas(type){
+  renderCanvas();
+  setTimeout(function(){
+    var canvas=document.getElementById('comp-canvas');
+    if(type==='img'){
+      var a=document.createElement('a'); a.href=canvas.toDataURL('image/png'); a.download='modelbook_divin_gangbo.png'; a.click();
+    } else {
+      var jsPDF=window.jspdf.jsPDF;
+      var pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+      var imgData=canvas.toDataURL('image/png');
+      var pw=pdf.internal.pageSize.getWidth(), ph=pdf.internal.pageSize.getHeight();
+      var cr=CW/CH, iw=pw-20, ih=iw/cr;
+      if(ih>ph-20){ ih=ph-20; iw=ih*cr; }
+      pdf.addImage(imgData,'PNG',(pw-iw)/2,10,iw,ih);
+      pdf.save('modelbook_divin_gangbo.pdf');
+    }
+  }, 400);
+}
+
+function exportInfoCard(type){
+  var wrapper=document.getElementById('info-comp-card').closest('.comp-card-info');
+  html2canvas(wrapper,{backgroundColor:'#111111',scale:2}).then(function(canvas){
+    if(type==='img'){
+      var a=document.createElement('a'); a.href=canvas.toDataURL('image/png'); a.download='infocard_divin_gangbo.png'; a.click();
+    } else {
+      var jsPDF=window.jspdf.jsPDF;
+      var pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+      var imgData=canvas.toDataURL('image/png'), pw=pdf.internal.pageSize.getWidth();
+      pdf.addImage(imgData,'PNG',10,10,pw-20,(pw-20)*canvas.height/canvas.width);
+      pdf.save('infocard_divin_gangbo.pdf');
+    }
+  });
+}
+
+// ─── UPLOAD TO SLOT ───────────────────────────────────────────
+function uploadToSlot(e){
+  var file=e.target.files[0]; if(!file) return;
+  var empty=ccSlots.findIndex(function(s){ return !s.src; });
+  if(empty===-1){ alert('All 5 slots are filled. Remove one first.'); return; }
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    ccSlots[empty]={photoId:null,src:ev.target.result,offsetX:0,offsetY:0,scale:1,role:SLOT_ROLES[empty].key};
+    renderSlotList(); renderCanvas();
+  };
+  reader.readAsDataURL(file); e.target.value='';
+}
+
+// ─── MANAGE ───────────────────────────────────────────────────
+function previewUpload(e){
+  var file=e.target.files[0]; if(!file) return;
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    uploadedSrc=ev.target.result;
+    var prev=document.getElementById('upload-preview'); prev.src=uploadedSrc; prev.style.display='block';
+    document.querySelector('.upload-icon').style.display='none';
+    document.querySelector('.upload-hint').style.display='none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function addPhoto(){
+  var title=document.getElementById('photo-title').value.trim()||'New Photo';
+  var cat=document.getElementById('photo-cat').value;
+  photos.push({id:nextId++,title:title,cat:cat,src:uploadedSrc});
+  uploadedSrc=null;
+  document.getElementById('photo-title').value='';
+  var prev=document.getElementById('upload-preview'); prev.src=''; prev.style.display='none';
+  document.querySelector('.upload-icon').style.display='block';
+  document.querySelector('.upload-hint').style.display='block';
+  document.getElementById('upload-zone').querySelector('input').value='';
+  renderGallery();
+  if(currentFilter!=='all'&&currentFilter!==cat) filterGallery('all');
+}
+
+function saveProfile(){
+  var name=document.getElementById('edit-name').value.trim()||'Model';
+  var bio=document.getElementById('edit-bio').value.trim();
+  var height=document.getElementById('edit-height').value.trim();
+  var meas=document.getElementById('edit-measurements').value.trim();
+  var eyes=document.getElementById('edit-eyes').value.trim();
+  document.getElementById('nav-name').textContent=name;
+  document.getElementById('hero-name').innerHTML=name.replace(' ','<br>');
+  document.getElementById('comp-name').textContent=name;
+  if(bio){ document.getElementById('hero-bio').textContent=bio; document.getElementById('about-bio').textContent=bio; }
+  if(height){ document.getElementById('stat-height').textContent=height; document.getElementById('comp-height').textContent=height; }
+  if(meas) document.getElementById('stat-measurements').textContent=meas;
+  if(eyes){ document.getElementById('stat-eyes').textContent=eyes; document.getElementById('comp-eyes').textContent=eyes; }
+  document.getElementById('footer-copy').textContent='© 2025 '+name+'. All rights reserved.';
+  var btn=event.target; btn.textContent='Saved ✓'; setTimeout(function(){ btn.textContent='Save profile'; },1800);
+}
+
+function changePassword(){
+  var val=document.getElementById('new-pw').value.trim(); if(!val) return;
+  adminPassword=val; document.getElementById('new-pw').value='';
+  var btn=event.target; btn.textContent='Updated ✓'; setTimeout(function(){ btn.textContent='Update password'; },1800);
+}
+
+function openPasswordModal(){
+  document.getElementById('pw-input').value='';
+  document.getElementById('pw-error').style.display='none';
+  document.getElementById('pw-modal').classList.add('open');
+  setTimeout(function(){ document.getElementById('pw-input').focus(); },100);
+}
+function closePasswordModal(){ document.getElementById('pw-modal').classList.remove('open'); }
+function checkPassword(){
+  if(document.getElementById('pw-input').value===adminPassword){ closePasswordModal(); openManagePanel(); }
+  else{ document.getElementById('pw-error').style.display='block'; document.getElementById('pw-input').value=''; document.getElementById('pw-input').focus(); }
+}
+function openManagePanel(){ document.getElementById('manage-panel').classList.add('open'); document.body.classList.add('manage-mode'); }
+function toggleManage(){ document.getElementById('manage-panel').classList.remove('open'); document.body.classList.remove('manage-mode'); }
+
+// ─── LIGHTBOX ─────────────────────────────────────────────────
+function openLightbox(idx){
+  var vis=getVisible().filter(function(p){ return p.src; }); if(!vis.length) return;
+  currentLightboxIndex=Math.min(idx,vis.length-1);
+  document.getElementById('lb-img').src=vis[currentLightboxIndex].src;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox(){ document.getElementById('lightbox').classList.remove('open'); }
+function lightboxNav(dir){
+  var lp=getVisible().filter(function(p){ return p.src; }); if(!lp.length) return;
+  currentLightboxIndex=(currentLightboxIndex+dir+lp.length)%lp.length;
+  document.getElementById('lb-img').src=lp[currentLightboxIndex].src;
+}
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){ closeLightbox(); closePasswordModal(); }
+  if(e.key==='ArrowLeft') lightboxNav(-1);
+  if(e.key==='ArrowRight') lightboxNav(1);
+});
+
+// ─── INIT ─────────────────────────────────────────────────────
+renderGallery();
+</script>
+</body>
+</html>
