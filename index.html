@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Divin Gangbo</title>
+<title>Divin Gangbo — Portfolio v1.0</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
@@ -66,96 +66,92 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.2rem
 .photo-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.7) 0%,transparent 50%);opacity:0;transition:opacity 0.3s;display:flex;flex-direction:column;justify-content:flex-end;padding:1.2rem;}
 .photo-card:hover .photo-overlay{opacity:1;}
 .photo-title-text{font-size:0.85rem;font-weight:600;}
-.photo-cat-label{font-size:0.72rem;color:#aaa;letter-spacing:0.08em;text-transform:uppercase;margin-top:0.2rem;}
+.photo-cat{font-size:0.72rem;color:#aaa;letter-spacing:0.08em;text-transform:uppercase;margin-top:0.2rem;}
 .photo-delete{position:absolute;top:0.6rem;right:0.6rem;background:rgba(200,50,50,0.85);color:white;border:none;width:26px;height:26px;border-radius:50%;font-size:0.85rem;cursor:pointer;display:none;align-items:center;justify-content:center;}
 .drag-handle{position:absolute;top:0.6rem;left:0.6rem;background:rgba(0,0,0,0.6);color:#ccc;width:26px;height:26px;border-radius:3px;font-size:1rem;display:none;align-items:center;justify-content:center;cursor:grab;}
+.select-badge{position:absolute;bottom:0.6rem;right:0.6rem;background:rgba(0,0,0,0.7);border:1px solid #444;color:#aaa;width:24px;height:24px;border-radius:50%;font-size:0.75rem;display:none;align-items:center;justify-content:center;cursor:pointer;}
+.select-badge.selected{background:#f0f0f0;color:#0a0a0a;border-color:#f0f0f0;}
 body.manage-mode .photo-delete{display:flex;}
 body.manage-mode .drag-handle{display:flex;}
 body.manage-mode .photo-card{cursor:default;}
+body.compcard-mode .select-badge{display:flex;}
 .photo-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;}
 .placeholder-label{font-size:0.72rem;color:#555;}
+#compcard-builder{padding:4rem 2.5rem;border-top:0.5px solid #1a1a1a;}
+.builder-header{margin-bottom:2.5rem;}
+.builder-header h2{font-size:clamp(1.8rem,4vw,3rem);font-weight:700;line-height:1.1;margin-bottom:0.8rem;}
+.builder-header p{color:#aaa;font-size:0.9rem;line-height:1.7;}
+.builder-layout{display:grid;grid-template-columns:1fr 400px;gap:2rem;align-items:start;}
+.canvas-wrap{background:#1a1a1a;border:0.5px solid #222;border-radius:4px;overflow:hidden;}
+#comp-canvas{display:block;width:100%;background:#fff;}
+.builder-controls{background:#111;border:0.5px solid #222;border-radius:4px;padding:1.5rem;display:flex;flex-direction:column;gap:1.2rem;max-height:90vh;overflow-y:auto;}
+.ctrl-section{display:flex;flex-direction:column;gap:0.6rem;}
+.ctrl-label{font-size:0.7rem;color:#666;letter-spacing:0.1em;text-transform:uppercase;}
+.ctrl-sublabel{font-size:0.68rem;color:#444;margin-top:-0.3rem;}
+.ctrl-input{background:#1a1a1a;border:0.5px solid #333;color:#f0f0f0;padding:0.55rem 0.8rem;font-size:0.85rem;border-radius:2px;width:100%;font-family:inherit;}
+.ctrl-input:focus{outline:none;border-color:#666;}
+.ctrl-select{background:#1a1a1a;border:0.5px solid #333;color:#f0f0f0;padding:0.55rem 0.8rem;font-size:0.85rem;border-radius:2px;width:100%;font-family:inherit;}
+.ctrl-row{display:flex;gap:0.5rem;}
+.ctrl-row .ctrl-input,.ctrl-row .ctrl-select{flex:1;}
+.ctrl-btn{background:#f0f0f0;color:#0a0a0a;border:none;padding:0.7rem;font-size:0.78rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border-radius:2px;width:100%;}
+.ctrl-btn:hover{background:#ccc;}
+.ctrl-btn-outline{background:transparent;color:#f0f0f0;border:0.5px solid #444;padding:0.7rem;font-size:0.78rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border-radius:2px;width:100%;}
+.ctrl-btn-outline:hover{border-color:#aaa;}
+.ctrl-btn-sm{background:transparent;color:#aaa;border:0.5px solid #333;padding:0.45rem 0.8rem;font-size:0.75rem;letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;border-radius:2px;}
+.ctrl-btn-sm:hover{border-color:#aaa;color:#f0f0f0;}
+.ctrl-divider{border:none;border-top:0.5px solid #222;}
+.template-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:0.4rem;}
+.tmpl-btn{aspect-ratio:7/10;background:#1a1a1a;border:1.5px solid transparent;border-radius:2px;cursor:pointer;overflow:hidden;padding:2px;transition:border-color 0.15s;position:relative;}
+.tmpl-btn:hover{border-color:#555;}
+.tmpl-btn.active{border-color:#f0f0f0;}
+.tmpl-preview{width:100%;height:calc(100% - 14px);position:relative;}
+.tmpl-num{font-size:6px;color:#555;text-align:center;margin-top:2px;letter-spacing:0.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tmpl-block{position:absolute;border-radius:1px;}
+.photo-slots{display:flex;flex-direction:column;gap:0.4rem;}
+.photo-slot{display:flex;align-items:center;gap:0.6rem;background:#1a1a1a;border:0.5px solid #2a2a2a;border-radius:3px;padding:0.5rem;cursor:pointer;}
+.photo-slot.active-slot{border-color:#888;}
+.slot-thumb{width:32px;height:46px;object-fit:cover;border-radius:1px;background:#222;flex-shrink:0;}
+.slot-thumb-empty{width:32px;height:46px;background:#1f1f1f;border:0.5px dashed #333;border-radius:1px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:#444;}
+.slot-info{flex:1;}
+.slot-name{font-size:0.75rem;color:#ccc;}
+.slot-role{font-size:0.68rem;color:#555;margin-top:1px;}
+.slot-remove{background:none;border:none;color:#555;cursor:pointer;font-size:1rem;line-height:1;padding:0;}
+.slot-remove:hover{color:#e55;}
+.crop-controls{display:flex;flex-direction:column;gap:0.5rem;}
+.crop-row{display:flex;align-items:center;gap:0.5rem;}
+.crop-lbl{font-size:0.7rem;color:#666;width:52px;flex-shrink:0;}
+.crop-slider{flex:1;height:3px;cursor:pointer;accent-color:#f0f0f0;}
+.crop-val{font-size:0.7rem;color:#555;width:36px;text-align:right;}
 #contact{padding:4rem 2.5rem;border-top:0.5px solid #1a1a1a;}
 .contact-left h2{font-size:clamp(1.8rem,4vw,3rem);font-weight:700;line-height:1.1;margin-bottom:1.2rem;}
 .contact-left p{color:#aaa;line-height:1.7;margin-bottom:2rem;max-width:380px;}
 .contact-item{display:flex;align-items:center;gap:0.8rem;margin-bottom:0.8rem;}
 .contact-dot{width:6px;height:6px;border-radius:50%;background:#f0f0f0;flex-shrink:0;}
 .contact-text{font-size:0.9rem;color:#aaa;}
-/* MANAGE PANEL */
-#manage-panel{display:none;position:fixed;top:0;right:0;width:380px;height:100vh;background:#111;border-left:0.5px solid #222;z-index:200;flex-direction:column;overflow:hidden;}
+#manage-panel{display:none;position:fixed;top:0;right:0;width:340px;height:100vh;background:#111;border-left:0.5px solid #222;z-index:200;flex-direction:column;overflow-y:auto;}
 #manage-panel.open{display:flex;}
-.panel-header{display:flex;justify-content:space-between;align-items:center;padding:1.2rem 1.5rem;border-bottom:0.5px solid #222;flex-shrink:0;}
+.panel-header{display:flex;justify-content:space-between;align-items:center;padding:1.5rem;border-bottom:0.5px solid #222;}
 .panel-title{font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:600;}
 .panel-close{background:none;border:none;color:#777;font-size:1.4rem;cursor:pointer;}
 .panel-close:hover{color:#f0f0f0;}
-.panel-tabs{display:flex;border-bottom:0.5px solid #222;flex-shrink:0;}
-.panel-tab{flex:1;background:none;border:none;color:#666;padding:0.75rem 0.5rem;font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;border-bottom:2px solid transparent;transition:color 0.2s;}
-.panel-tab:hover{color:#aaa;}
-.panel-tab.active{color:#f0f0f0;border-bottom-color:#f0f0f0;}
-.panel-tab-content{display:none;padding:1.2rem 1.5rem;flex-direction:column;gap:1rem;overflow-y:auto;flex:1;}
-.panel-tab-content.active{display:flex;}
+.panel-body{padding:1.5rem;flex:1;display:flex;flex-direction:column;gap:1.2rem;}
 .panel-section{display:flex;flex-direction:column;gap:0.6rem;}
 .panel-label{font-size:0.72rem;color:#777;letter-spacing:0.1em;text-transform:uppercase;}
 .panel-input{background:#1a1a1a;border:0.5px solid #333;color:#f0f0f0;padding:0.65rem 0.9rem;font-size:0.9rem;border-radius:2px;width:100%;font-family:inherit;}
 .panel-input:focus{outline:none;border-color:#666;}
 .panel-select{background:#1a1a1a;border:0.5px solid #333;color:#f0f0f0;padding:0.65rem 0.9rem;font-size:0.9rem;border-radius:2px;width:100%;font-family:inherit;}
-.panel-upload{border:1px dashed #333;border-radius:4px;padding:1.2rem;text-align:center;cursor:pointer;position:relative;}
+.panel-upload{border:1px dashed #333;border-radius:4px;padding:1.5rem;text-align:center;cursor:pointer;position:relative;}
 .panel-upload:hover{border-color:#666;}
 .panel-upload input{position:absolute;inset:0;opacity:0;cursor:pointer;}
-.upload-icon{font-size:1.8rem;color:#444;margin-bottom:0.4rem;}
+.upload-icon{font-size:1.8rem;color:#444;margin-bottom:0.5rem;}
 .upload-hint{font-size:0.78rem;color:#555;line-height:1.5;}
 .upload-preview{width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:2px;display:none;}
-.btn-add{background:#f0f0f0;color:#0a0a0a;border:none;padding:0.8rem;font-size:0.82rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border-radius:2px;width:100%;}
+.btn-add{background:#f0f0f0;color:#0a0a0a;border:none;padding:0.85rem;font-size:0.82rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border-radius:2px;width:100%;}
 .btn-add:hover{background:#ccc;}
-.btn-danger{background:transparent;color:#e55;border:0.5px solid #e55;padding:0.65rem;font-size:0.78rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border-radius:2px;width:100%;}
-.btn-danger:hover{background:rgba(220,80,80,0.1);}
-.btn-neutral{background:transparent;color:#aaa;border:0.5px solid #444;padding:0.65rem;font-size:0.78rem;font-weight:500;letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;border-radius:2px;width:100%;}
-.btn-neutral:hover{border-color:#aaa;color:#f0f0f0;}
-.panel-divider{border:none;border-top:0.5px solid #222;flex-shrink:0;}
+.panel-divider{border:none;border-top:0.5px solid #222;}
 .panel-info{font-size:0.78rem;color:#555;line-height:1.6;}
 .profile-edit-row{display:flex;gap:0.6rem;}
 .profile-edit-row .panel-input{flex:1;}
-
-/* PHOTO MANAGER */
-.pm-toolbar{display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;}
-.pm-toolbar-btn{background:transparent;color:#aaa;border:0.5px solid #333;padding:0.35rem 0.7rem;font-size:0.72rem;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border-radius:2px;white-space:nowrap;}
-.pm-toolbar-btn:hover{border-color:#aaa;color:#f0f0f0;}
-.pm-toolbar-btn.active-sel{background:#f0f0f0;color:#0a0a0a;border-color:#f0f0f0;}
-.pm-selection-bar{background:#1a1a1a;border:0.5px solid #333;border-radius:3px;padding:0.6rem 0.8rem;display:flex;align-items:center;justify-content:space-between;gap:0.5rem;flex-wrap:wrap;}
-.pm-sel-count{font-size:0.75rem;color:#aaa;}
-.pm-sel-actions{display:flex;gap:0.4rem;flex-wrap:wrap;}
-.pm-sel-btn{padding:0.3rem 0.7rem;font-size:0.72rem;letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;border-radius:2px;border:0.5px solid;}
-.pm-sel-btn.show{color:#7b7;border-color:#7b7;background:transparent;}
-.pm-sel-btn.show:hover{background:rgba(100,180,100,0.1);}
-.pm-sel-btn.hide{color:#a88;border-color:#a88;background:transparent;}
-.pm-sel-btn.hide:hover{background:rgba(180,100,100,0.1);}
-.pm-sel-btn.del{color:#e55;border-color:#e55;background:transparent;}
-.pm-sel-btn.del:hover{background:rgba(220,80,80,0.1);}
-.photo-manager-list{display:flex;flex-direction:column;gap:0.3rem;overflow-y:auto;max-height:340px;}
-.photo-manager-item{display:flex;align-items:center;gap:0.6rem;background:#1a1a1a;border:0.5px solid #2a2a2a;border-radius:3px;padding:0.45rem 0.6rem;cursor:pointer;transition:border-color 0.15s;}
-.photo-manager-item:hover{border-color:#444;}
-.photo-manager-item.pm-selected{border-color:#f0f0f0;background:#1f1f1f;}
-.pm-checkbox{width:16px;height:16px;border:0.5px solid #444;border-radius:2px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:#0a0a0a;transition:background 0.15s;}
-.photo-manager-item.pm-selected .pm-checkbox{background:#f0f0f0;border-color:#f0f0f0;color:#0a0a0a;}
-.pm-thumb{width:26px;height:38px;object-fit:cover;border-radius:1px;flex-shrink:0;background:#222;}
-.pm-thumb-empty{width:26px;height:38px;background:#1f1f1f;border:0.5px dashed #333;border-radius:1px;flex-shrink:0;}
-.pm-info{flex:1;min-width:0;}
-.pm-name{font-size:0.73rem;color:#ccc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.pm-cat{font-size:0.62rem;color:#555;text-transform:uppercase;letter-spacing:0.05em;}
-.pm-vis{font-size:0.62rem;padding:2px 5px;border-radius:2px;flex-shrink:0;}
-.pm-vis.visible{background:#1a3a1a;color:#7b7;}
-.pm-vis.hidden{background:#2a2a2a;color:#666;}
-.pm-del-single{background:none;border:none;color:#444;cursor:pointer;font-size:0.9rem;line-height:1;padding:0 2px;flex-shrink:0;}
-.pm-del-single:hover{color:#e55;}
-
-/* SETTINGS */
-.cat-limit-grid{display:grid;grid-template-columns:1fr 72px;gap:0.5rem 0.8rem;align-items:center;}
-.cat-limit-label{font-size:0.8rem;color:#aaa;}
-.settings-num{background:#1a1a1a;border:0.5px solid #333;color:#f0f0f0;padding:0.45rem 0.6rem;font-size:0.88rem;border-radius:2px;width:100%;text-align:center;font-family:inherit;}
-.settings-num:focus{outline:none;border-color:#666;}
-.vis-bar{height:4px;background:#1a1a1a;border-radius:2px;overflow:hidden;margin-top:4px;}
-.vis-bar-fill{height:100%;background:#f0f0f0;border-radius:2px;transition:width 0.3s;}
-
-/* PW MODAL */
 #pw-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:400;align-items:center;justify-content:center;}
 #pw-modal.open{display:flex;}
 .pw-box{background:#111;border:0.5px solid #333;border-radius:4px;padding:2.5rem;width:300px;display:flex;flex-direction:column;gap:1rem;}
@@ -182,15 +178,16 @@ footer{padding:2rem 2.5rem;border-top:0.5px solid #1a1a1a;display:flex;justify-c
 .footer-links{display:flex;gap:1.5rem;}
 .footer-links a{font-size:0.75rem;color:#555;text-decoration:none;letter-spacing:0.06em;}
 .footer-links a:hover{color:#aaa;}
-@media(max-width:768px){#about{grid-template-columns:1fr;gap:2rem;}nav,#hero,#gallery,#about,#contact,footer{padding-left:1.2rem;padding-right:1.2rem;}#manage-panel{width:100%;}}
+@media(max-width:1000px){.builder-layout{grid-template-columns:1fr;}.builder-controls{max-height:none;}}
+@media(max-width:768px){#about{grid-template-columns:1fr;gap:2rem;}.template-grid{grid-template-columns:repeat(5,1fr);}nav,#hero,#gallery,#about,#contact,#compcard-builder,footer{padding-left:1.2rem;padding-right:1.2rem;}#manage-panel{width:100%;}}
 </style>
 </head>
 <body>
 
-<div id="manage-banner">Manage mode active — drag ⠿ to reorder, use Photos tab to manage visibility and remove photos.</div>
+<div id="manage-banner">Manage mode active — drag ⠿ to reorder, × to remove, or use the panel to add photos.</div>
 
 <nav>
-  <div class="nav-logo" id="nav-name">Divin Gangbo</div>
+  <div class="nav-logo" id="nav-name">Divin Gangbo <span id="pf-sync-dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#999;margin-left:4px;vertical-align:middle;cursor:help;" title="Sync status"></span></div>
   <div class="nav-links">
     <a href="#about">About</a><a href="#gallery">Portfolio</a><a href="#contact">Contact</a>
   </div>
@@ -263,16 +260,22 @@ footer{padding:2rem 2.5rem;border-top:0.5px solid #1a1a1a;display:flex;justify-c
 <section id="gallery">
   <div class="section-header">
     <span class="section-title">Portfolio</span>
-    <div class="filter-bar" id="filter-bar">
-      <button class="filter-btn active" data-cat="all" onclick="filterGallery('all')">All</button>
-      <button class="filter-btn" data-cat="editorial" onclick="filterGallery('editorial')">Editorial</button>
-      <button class="filter-btn" data-cat="sports" onclick="filterGallery('sports')">Sports</button>
-      <button class="filter-btn" data-cat="casual" onclick="filterGallery('casual')">Casual</button>
-      <button class="filter-btn" data-cat="portrait" onclick="filterGallery('portrait')">Portrait</button>
+    <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap;">
+      <div class="filter-bar" id="filter-bar">
+        <button class="filter-btn active" data-cat="all" onclick="filterGallery('all')">All</button>
+        <button class="filter-btn" data-cat="editorial" onclick="filterGallery('editorial')">Editorial</button>
+        <button class="filter-btn" data-cat="sports" onclick="filterGallery('sports')">Sports</button>
+        <button class="filter-btn" data-cat="casual" onclick="filterGallery('casual')">Casual</button>
+        <button class="filter-btn" data-cat="portrait" onclick="filterGallery('portrait')">Portrait</button>
+      </div>
+      <button id="select-photos-btn" class="ctrl-btn-sm" onclick="toggleSelectMode()">Select for model book</button>
     </div>
   </div>
+  <div id="select-hint" style="display:none;font-size:0.78rem;color:#666;margin-bottom:1rem;">Click ✓ on photos to assign them to slots. Selected: <span id="selected-count">0</span></div>
   <div class="gallery-grid" id="gallery-grid"></div>
 </section>
+
+
 
 <section id="contact">
   <div class="contact-left">
@@ -290,7 +293,6 @@ footer{padding:2rem 2.5rem;border-top:0.5px solid #1a1a1a;display:flex;justify-c
   <div class="footer-links"><a href="https://instagram.com/Dnice_baby">Instagram</a><a href="#">Press</a></div>
 </footer>
 
-<!-- PW MODAL -->
 <div id="pw-modal">
   <div class="pw-box">
     <div class="pw-title">Admin access</div>
@@ -304,30 +306,22 @@ footer{padding:2rem 2.5rem;border-top:0.5px solid #1a1a1a;display:flex;justify-c
   </div>
 </div>
 
-<!-- MANAGE PANEL -->
 <div id="manage-panel">
   <div class="panel-header">
-    <span class="panel-title">Manage</span>
+    <span class="panel-title">Manage Portfolio</span>
     <button class="panel-close" onclick="toggleManage()">×</button>
   </div>
-  <div class="panel-tabs">
-    <button class="panel-tab active" onclick="switchTab('tab-profile')">Profile</button>
-    <button class="panel-tab" onclick="switchTab('tab-photos')">Photos</button>
-    <button class="panel-tab" onclick="switchTab('tab-settings')">Settings</button>
-  </div>
-
-  <!-- PROFILE TAB -->
-  <div class="panel-tab-content active" id="tab-profile">
+  <div class="panel-body">
     <div class="panel-section">
       <span class="panel-label">Profile details</span>
-      <input class="panel-input" id="edit-name" value="Divin Gangbo" placeholder="Model name">
+      <input class="panel-input" id="edit-name" value="Divin Gangbo">
       <textarea class="panel-input" id="edit-bio" rows="3" style="resize:vertical;">Paris-based model available for editorial, commercial, and runway work. Looking for representation by talent agencies across the UK and Europe.</textarea>
       <div class="profile-edit-row">
-        <input class="panel-input" id="edit-height" value="187cm / 6'2&quot;" placeholder="Height">
-        <input class="panel-input" id="edit-measurements" value="105 / 86 / 95" placeholder="Measurements">
-        <input class="panel-input" id="edit-eyes" value="Brown" placeholder="Eyes">
+        <input class="panel-input" id="edit-height" value="187cm / 6'2&quot;">
+        <input class="panel-input" id="edit-measurements" value="105 / 86 / 95">
+        <input class="panel-input" id="edit-eyes" value="Brown">
       </div>
-      <input class="panel-input" id="edit-email" value="divingangbo@yahoo.fr" placeholder="Booking email">
+      <input class="panel-input" id="edit-email" value="divingangbo@yahoo.fr">
       <button class="btn-add" onclick="saveProfile()">Save profile</button>
     </div>
     <hr class="panel-divider">
@@ -336,10 +330,7 @@ footer{padding:2rem 2.5rem;border-top:0.5px solid #1a1a1a;display:flex;justify-c
       <input class="panel-input" id="new-pw" type="password" placeholder="New password">
       <button class="btn-add" onclick="changePassword()">Update password</button>
     </div>
-  </div>
-
-  <!-- PHOTOS TAB -->
-  <div class="panel-tab-content" id="tab-photos">
+    <hr class="panel-divider">
     <div class="panel-section">
       <span class="panel-label">Add photo</span>
       <div class="panel-upload" id="upload-zone">
@@ -357,72 +348,11 @@ footer{padding:2rem 2.5rem;border-top:0.5px solid #1a1a1a;display:flex;justify-c
       </select>
       <button class="btn-add" onclick="addPhoto()">+ Add to portfolio</button>
     </div>
-
     <hr class="panel-divider">
-
-    <div class="panel-section">
-      <span class="panel-label">Manage photos</span>
-      <!-- Toolbar -->
-      <div class="pm-toolbar">
-        <select class="panel-select" id="pm-filter" onchange="pmFilterChange()" style="flex:1;padding:0.45rem 0.7rem;font-size:0.8rem;">
-          <option value="all">All categories</option>
-          <option value="editorial">Editorial</option>
-          <option value="sports">Sports</option>
-          <option value="casual">Casual</option>
-          <option value="portrait">Portrait</option>
-        </select>
-        <select class="panel-select" id="pm-vis-filter" onchange="renderPhotoManager()" style="flex:1;padding:0.45rem 0.7rem;font-size:0.8rem;">
-          <option value="all">All photos</option>
-          <option value="public">Public only</option>
-          <option value="hidden">Hidden only</option>
-        </select>
-      </div>
-      <div class="pm-toolbar">
-        <button class="pm-toolbar-btn" onclick="pmSelectAll()">Select all</button>
-        <button class="pm-toolbar-btn" onclick="pmSelectNone()">Deselect all</button>
-        <button class="pm-toolbar-btn" onclick="pmSelectPublic()">Select public</button>
-        <button class="pm-toolbar-btn" onclick="pmSelectHidden()">Select hidden</button>
-      </div>
-      <!-- Selection action bar -->
-      <div class="pm-selection-bar" id="pm-sel-bar" style="display:none;">
-        <span class="pm-sel-count" id="pm-sel-count">0 selected</span>
-        <div class="pm-sel-actions">
-          <button class="pm-sel-btn show" onclick="pmSetVisibility(true)">Make public</button>
-          <button class="pm-sel-btn hide" onclick="pmSetVisibility(false)">Hide</button>
-          <button class="pm-sel-btn del" onclick="pmDeleteSelected()">Delete</button>
-        </div>
-      </div>
-      <!-- List -->
-      <div class="photo-manager-list" id="photo-manager-list"></div>
-    </div>
-  </div>
-
-  <!-- SETTINGS TAB -->
-  <div class="panel-tab-content" id="tab-settings">
-    <div class="panel-section">
-      <span class="panel-label">Public visibility limit per category</span>
-      <p class="panel-info">The number of photos shown publicly per category. Photos beyond the limit are hidden from visitors but kept in storage. You can also manually override visibility per photo in the Photos tab.</p>
-      <div class="cat-limit-grid">
-        <span class="cat-limit-label">Editorial</span>
-        <input class="settings-num" type="number" id="limit-editorial" min="0" max="50" value="50" onchange="applyLimits()">
-        <span class="cat-limit-label">Sports</span>
-        <input class="settings-num" type="number" id="limit-sports" min="0" max="50" value="50" onchange="applyLimits()">
-        <span class="cat-limit-label">Casual</span>
-        <input class="settings-num" type="number" id="limit-casual" min="0" max="50" value="50" onchange="applyLimits()">
-        <span class="cat-limit-label">Portrait</span>
-        <input class="settings-num" type="number" id="limit-portrait" min="0" max="50" value="50" onchange="applyLimits()">
-      </div>
-      <button class="btn-add" onclick="applyLimits()">Apply limits</button>
-    </div>
-    <hr class="panel-divider">
-    <div class="panel-section">
-      <span class="panel-label">Visibility summary</span>
-      <div id="vis-summary"></div>
-    </div>
+    <p class="panel-info">Drag ⠿ to reorder photos. × to remove. Changes apply instantly.</p>
   </div>
 </div>
 
-<!-- LIGHTBOX -->
 <div id="lightbox" onclick="closeLightbox()">
   <button class="lb-close" onclick="closeLightbox()">×</button>
   <button class="lb-nav" id="lb-prev" onclick="event.stopPropagation();lightboxNav(-1)">‹</button>
@@ -431,263 +361,502 @@ footer{padding:2rem 2.5rem;border-top:0.5px solid #1a1a1a;display:flex;justify-c
 </div>
 
 <script>
-var PLACEHOLDER_COLORS = ['#1a2a3a','#2a1a3a','#1a3a2a','#3a1a1a','#2a3a1a','#1a1a3a','#3a2a1a','#2a3a3a'];
-var CATS = ['editorial','sports','casual','portrait'];
-var adminPassword = 'admin123';
+// ─── SERVER SYNC LAYER (same pattern as Cinema Aggregator & ModelBook) ─────
+var PF_API = 'https://silver-dollop-4zjb.onrender.com/api/portfolio';
+var PF_KEYS = ['pf_photos', 'pf_nextId', 'pf_password', 'pf_ccSlots', 'pf_currentTemplate', 'pf_profile'];
+var _pfSyncTimer = null;
+var _pfSyncReady = false;
 
-// Build 50 photos per category
-var photos = [];
-var _id = 1;
-CATS.forEach(function(cat){
-  var label = cat.charAt(0).toUpperCase() + cat.slice(1);
-  for(var i = 1; i <= 50; i++){
-    // Each photo has a 'public' override flag (null = use limit, true = force public, false = force hidden)
-    photos.push({id:_id++, title:label+' '+i, cat:cat, src:null, publicOverride:null});
-  }
-});
-var nextId = _id;
+function _pfGetAllData() {
+  var data = {};
+  PF_KEYS.forEach(function(k) { var v = localStorage.getItem(k); if (v !== null) data[k] = v; });
+  return data;
+}
+
+function _pfSyncDot(color, title) {
+  var dot = document.getElementById('pf-sync-dot');
+  if (dot) { dot.style.background = color; dot.title = title; }
+}
+
+function _pfSyncToServer() {
+  if (!PF_API || !_pfSyncReady) return;
+  clearTimeout(_pfSyncTimer);
+  _pfSyncTimer = setTimeout(function() {
+    var data = _pfGetAllData();
+    fetch(PF_API + '/data', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    }).then(function(r) {
+      if (r.ok) _pfSyncDot('#2d7a3a', 'Synced ' + new Date().toLocaleTimeString());
+    }).catch(function(e) {
+      console.log('Sync push failed:', e.message);
+      _pfSyncDot('#c0392b', 'Offline');
+    });
+  }, 2000);
+}
+
+function _pfSyncFromServer() {
+  if (!PF_API) { _pfSyncReady = true; return Promise.resolve(); }
+  return fetch(PF_API + '/data', { signal: AbortSignal.timeout(5000) })
+    .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(function(data) {
+      var keys = Object.keys(data);
+      if (keys.length > 0) {
+        keys.forEach(function(k) { localStorage.setItem(k, data[k]); });
+        console.log('Portfolio: synced ' + keys.length + ' keys from server.');
+      }
+      _pfSyncDot('#2d7a3a', 'Connected');
+    })
+    .catch(function(e) {
+      console.log('Server unavailable, using local data:', e.message);
+      _pfSyncDot('#c0392b', 'Offline');
+    })
+    .then(function() { _pfSyncReady = true; });
+}
+
+// Hook localStorage writes for portfolio keys to auto-sync
+var _pfOrigSetItem = Storage.prototype.setItem;
+Storage.prototype.setItem = function(key, value) {
+  _pfOrigSetItem.call(this, key, value);
+  if (key.indexOf('pf_') === 0) _pfSyncToServer();
+};
+
+// Manual push/pull
+function pfSyncPush() {
+  var data = _pfGetAllData();
+  fetch(PF_API + '/data', {
+    method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data)
+  }).then(function(r) {
+    if (r.ok) _pfSyncDot('#2d7a3a', 'Pushed ' + new Date().toLocaleTimeString());
+  }).catch(function(e) { _pfSyncDot('#c0392b', 'Push failed'); });
+}
+
+function pfSyncPull() {
+  fetch(PF_API + '/data', { signal: AbortSignal.timeout(10000) })
+    .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(function(data) {
+      Object.keys(data).forEach(function(k) { localStorage.setItem(k, data[k]); });
+      _pfSyncDot('#2d7a3a', 'Pulled ' + new Date().toLocaleTimeString());
+      _pfRestoreState();
+      renderGallery();
+    }).catch(function(e) { _pfSyncDot('#c0392b', 'Pull failed'); });
+}
+
+// Save state to localStorage
+function saveState() {
+  var profileName = document.getElementById('edit-name').value;
+  var profileBio = document.getElementById('edit-bio').value;
+  var profileHeight = document.getElementById('edit-height').value;
+  var profileMeas = document.getElementById('edit-measurements').value;
+  var profileEyes = document.getElementById('edit-eyes').value;
+  var profileEmail = document.getElementById('edit-email').value;
+  localStorage.setItem('pf_profile', JSON.stringify({ name: profileName, bio: profileBio, height: profileHeight, measurements: profileMeas, eyes: profileEyes, email: profileEmail }));
+  localStorage.setItem('pf_photos', JSON.stringify(photos));
+  localStorage.setItem('pf_nextId', String(nextId));
+  localStorage.setItem('pf_password', adminPassword);
+  localStorage.setItem('pf_ccSlots', JSON.stringify(ccSlots));
+  localStorage.setItem('pf_currentTemplate', String(currentTemplate));
+}
+
+// Restore state from localStorage
+function _pfRestoreState() {
+  try {
+    var raw;
+    raw = localStorage.getItem('pf_photos');
+    if (raw) { var parsed = JSON.parse(raw); if (parsed && parsed.length) photos = parsed; }
+    raw = localStorage.getItem('pf_nextId');
+    if (raw) nextId = parseInt(raw) || nextId;
+    raw = localStorage.getItem('pf_password');
+    if (raw) adminPassword = raw;
+    raw = localStorage.getItem('pf_ccSlots');
+    if (raw) { var sl = JSON.parse(raw); if (sl) ccSlots = sl; }
+    raw = localStorage.getItem('pf_currentTemplate');
+    if (raw) currentTemplate = parseInt(raw) || 0;
+    raw = localStorage.getItem('pf_profile');
+    if (raw) {
+      var p = JSON.parse(raw);
+      if (p) {
+        if (p.name) {
+          document.getElementById('edit-name').value = p.name;
+          document.getElementById('nav-name').textContent = p.name;
+          document.getElementById('hero-name').innerHTML = p.name.replace(' ', '<br>');
+          document.getElementById('comp-name').textContent = p.name;
+          document.getElementById('footer-copy').textContent = '© 2025 ' + p.name + '. All rights reserved.';
+        }
+        if (p.bio) {
+          document.getElementById('edit-bio').value = p.bio;
+          document.getElementById('hero-bio').textContent = p.bio;
+          document.getElementById('about-bio').textContent = p.bio;
+        }
+        if (p.height) {
+          document.getElementById('edit-height').value = p.height;
+          document.getElementById('stat-height').textContent = p.height;
+          document.getElementById('comp-height').textContent = p.height;
+        }
+        if (p.measurements) {
+          document.getElementById('edit-measurements').value = p.measurements;
+          document.getElementById('stat-measurements').textContent = p.measurements;
+        }
+        if (p.eyes) {
+          document.getElementById('edit-eyes').value = p.eyes;
+          document.getElementById('stat-eyes').textContent = p.eyes;
+          document.getElementById('comp-eyes').textContent = p.eyes;
+        }
+        if (p.email) {
+          document.getElementById('edit-email').value = p.email;
+        }
+      }
+    }
+  } catch (e) { console.warn('Restore failed:', e.message); }
+}
+
+// ─── CONSTANTS ────────────────────────────────────────────────
+var SLOT_ROLES = [
+  {key:'headshot', label:'Headshot', tc:'#7ab'},
+  {key:'fullbody', label:'Full Body', tc:'#7b7'},
+  {key:'bw',       label:'B&W',       tc:'#999'},
+  {key:'extra1',   label:'Extra 1',   tc:'#a8a'},
+  {key:'extra2',   label:'Extra 2',   tc:'#ba9'}
+];
+var PLACEHOLDER_COLORS = ['#1a2a3a','#2a1a3a','#1a3a2a','#3a1a1a','#2a3a1a','#1a1a3a','#3a2a1a','#2a3a3a'];
+var CW = 600, CH = 900;
+
+// ─── STATE ────────────────────────────────────────────────────
+var adminPassword = 'admin123';
+var photos = [
+  {id:1,title:'Editorial 1',cat:'editorial',src:null},
+  {id:2,title:'Editorial 2',cat:'editorial',src:null},
+  {id:3,title:'Editorial 3',cat:'editorial',src:null},
+  {id:4,title:'Editorial 4',cat:'editorial',src:null},
+  {id:5,title:'Editorial 5',cat:'editorial',src:null},
+  {id:6,title:'Editorial 6',cat:'editorial',src:null},
+  {id:7,title:'Editorial 7',cat:'editorial',src:null},
+  {id:8,title:'Editorial 8',cat:'editorial',src:null},
+  {id:9,title:'Editorial 9',cat:'editorial',src:null},
+  {id:10,title:'Editorial 10',cat:'editorial',src:null},
+  {id:11,title:'Sports 1',cat:'sports',src:null},
+  {id:12,title:'Sports 2',cat:'sports',src:null},
+  {id:13,title:'Sports 3',cat:'sports',src:null},
+  {id:14,title:'Sports 4',cat:'sports',src:null},
+  {id:15,title:'Sports 5',cat:'sports',src:null},
+  {id:16,title:'Sports 6',cat:'sports',src:null},
+  {id:17,title:'Sports 7',cat:'sports',src:null},
+  {id:18,title:'Sports 8',cat:'sports',src:null},
+  {id:19,title:'Sports 9',cat:'sports',src:null},
+  {id:20,title:'Sports 10',cat:'sports',src:null},
+  {id:21,title:'Casual 1',cat:'casual',src:null},
+  {id:22,title:'Casual 2',cat:'casual',src:null},
+  {id:23,title:'Casual 3',cat:'casual',src:null},
+  {id:24,title:'Casual 4',cat:'casual',src:null},
+  {id:25,title:'Casual 5',cat:'casual',src:null},
+  {id:26,title:'Casual 6',cat:'casual',src:null},
+  {id:27,title:'Casual 7',cat:'casual',src:null},
+  {id:28,title:'Casual 8',cat:'casual',src:null},
+  {id:29,title:'Casual 9',cat:'casual',src:null},
+  {id:30,title:'Casual 10',cat:'casual',src:null},
+  {id:31,title:'Portrait 1',cat:'portrait',src:null},
+  {id:32,title:'Portrait 2',cat:'portrait',src:null},
+  {id:33,title:'Portrait 3',cat:'portrait',src:null},
+  {id:34,title:'Portrait 4',cat:'portrait',src:null},
+  {id:35,title:'Portrait 5',cat:'portrait',src:null},
+  {id:36,title:'Portrait 6',cat:'portrait',src:null},
+  {id:37,title:'Portrait 7',cat:'portrait',src:null},
+  {id:38,title:'Portrait 8',cat:'portrait',src:null},
+  {id:39,title:'Portrait 9',cat:'portrait',src:null},
+  {id:40,title:'Portrait 10',cat:'portrait',src:null}
+];
+var nextId = 41;
 var currentFilter = 'all';
 var currentLightboxIndex = 0;
 var dragSrcId = null;
 var uploadedSrc = null;
-var visLimits = {editorial:50, sports:50, casual:50, portrait:50};
-var pmSelectedIds = [];
+var selectMode = false;
+var ccSlots = SLOT_ROLES.map(function(r){ return {photoId:null,src:null,offsetX:0,offsetY:0,scale:1,role:r.key}; });
+var activeSlotIdx = null;
+var currentTemplate = 0;
 
-// ─── VISIBILITY LOGIC ─────────────────────────────────────────
-function isPhotoPublic(p){
-  if(p.publicOverride === true) return true;
-  if(p.publicOverride === false) return false;
-  var catPhotos = photos.filter(function(x){ return x.cat === p.cat; });
-  var idx = catPhotos.indexOf(p);
-  return idx < visLimits[p.cat];
-}
+
 
 // ─── GALLERY ──────────────────────────────────────────────────
-function getVisible(){
-  return currentFilter === 'all' ? photos : photos.filter(function(p){ return p.cat === currentFilter; });
-}
+function getVisible(){ return currentFilter==='all' ? photos : photos.filter(function(p){ return p.cat===currentFilter; }); }
 
 function renderGallery(){
   var grid = document.getElementById('gallery-grid');
   grid.innerHTML = '';
   var visible = getVisible();
-  var inManage = document.body.classList.contains('manage-mode');
-
+  if(!visible.length){ grid.innerHTML='<p style="color:#555;font-size:0.85rem;padding:2rem 0;">No photos yet.</p>'; return; }
   visible.forEach(function(p, i){
-    var pub = isPhotoPublic(p);
-    if(!inManage && !pub) return;
-
     var card = document.createElement('div');
     card.className = 'photo-card'; card.dataset.id = p.id;
 
-    var handle = document.createElement('div'); handle.className = 'drag-handle'; handle.innerHTML = '⠿';
-    handle.addEventListener('mousedown', function(){ card.draggable = true; });
+    var handle = document.createElement('div'); handle.className='drag-handle'; handle.innerHTML='⠿';
+    handle.addEventListener('mousedown', function(){ card.draggable=true; });
 
-    var delBtn = document.createElement('button'); delBtn.className = 'photo-delete'; delBtn.innerHTML = '×';
-    delBtn.onclick = function(e){ e.stopPropagation(); deletePhotoById(p.id); };
+    var delBtn = document.createElement('button'); delBtn.className='photo-delete'; delBtn.innerHTML='×';
+    delBtn.onclick = function(e){ e.stopPropagation(); deletePhoto(p.id); };
 
-    if(inManage && !pub){
-      var hiddenTag = document.createElement('div');
-      hiddenTag.style.cssText = 'position:absolute;inset:0;background:rgba(0,0,0,0.52);display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1;';
-      hiddenTag.innerHTML = '<span style="font-size:0.68rem;color:#aaa;letter-spacing:0.1em;text-transform:uppercase;background:rgba(0,0,0,0.7);padding:3px 7px;border-radius:2px;">Hidden</span>';
-      card.appendChild(hiddenTag);
-    }
+    var selBadge = document.createElement('div'); selBadge.className='select-badge'; selBadge.innerHTML='✓'; selBadge.dataset.id=p.id;
+    if(ccSlots.some(function(s){ return s && s.photoId===p.id; })) selBadge.classList.add('selected');
+    selBadge.onclick = function(e){ e.stopPropagation(); togglePhotoSelect(p.id, selBadge); };
 
     if(p.src){
-      var img = document.createElement('img'); img.src = p.src; img.alt = p.title; img.loading = 'lazy';
-      var ov = document.createElement('div'); ov.className = 'photo-overlay';
-      ov.innerHTML = '<div class="photo-title-text">'+p.title+'</div><div class="photo-cat-label">'+p.cat+'</div>';
+      var img = document.createElement('img'); img.src=p.src; img.alt=p.title; img.loading='lazy';
+      var ov = document.createElement('div'); ov.className='photo-overlay';
+      ov.innerHTML = '<div class="photo-title-text">'+p.title+'</div><div class="photo-cat">'+p.cat+'</div>';
       card.appendChild(img); card.appendChild(ov);
       card.addEventListener('click', function(){
-        if(inManage) return;
+        if(document.body.classList.contains('manage-mode')) return;
+        if(selectMode){ togglePhotoSelect(p.id, selBadge); return; }
         openLightbox(i);
       });
     } else {
-      var ph = document.createElement('div'); ph.className = 'photo-placeholder';
-      ph.style.background = PLACEHOLDER_COLORS[p.id % 8];
-      ph.innerHTML = '<div style="width:40px;height:40px;border-radius:50%;background:#222;display:flex;align-items:center;justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div><span class="placeholder-label">'+p.title+'</span><span class="placeholder-label" style="color:#444;">'+p.cat+'</span>';
+      var ph = document.createElement('div'); ph.className='photo-placeholder'; ph.style.background=PLACEHOLDER_COLORS[p.id%8];
+      ph.innerHTML='<div style="width:40px;height:40px;border-radius:50%;background:#222;display:flex;align-items:center;justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div><span class="placeholder-label">'+p.title+'</span><span class="placeholder-label" style="color:#444;">'+p.cat+'</span>';
       card.appendChild(ph);
     }
-    card.appendChild(handle); card.appendChild(delBtn);
+    card.appendChild(handle); card.appendChild(delBtn); card.appendChild(selBadge);
 
-    card.addEventListener('dragstart', function(e){ dragSrcId = p.id; card.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; });
-    card.addEventListener('dragend', function(){ card.draggable = false; card.classList.remove('dragging'); document.querySelectorAll('.photo-card').forEach(function(c){ c.classList.remove('drag-over'); }); });
+    card.addEventListener('dragstart', function(e){ dragSrcId=p.id; card.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; });
+    card.addEventListener('dragend', function(){ card.draggable=false; card.classList.remove('dragging'); document.querySelectorAll('.photo-card').forEach(function(c){ c.classList.remove('drag-over'); }); });
     card.addEventListener('dragover', function(e){ e.preventDefault(); document.querySelectorAll('.photo-card').forEach(function(c){ c.classList.remove('drag-over'); }); card.classList.add('drag-over'); });
     card.addEventListener('drop', function(e){
-      e.preventDefault(); if(dragSrcId === p.id) return;
-      var si = photos.findIndex(function(x){ return x.id === dragSrcId; });
-      var ti = photos.findIndex(function(x){ return x.id === p.id; });
-      if(si === -1 || ti === -1) return;
-      var moved = photos.splice(si,1)[0]; photos.splice(ti,0,moved);
-      renderGallery(); renderVisSummary();
+      e.preventDefault(); if(dragSrcId===p.id) return;
+      var si=photos.findIndex(function(x){ return x.id===dragSrcId; }), ti=photos.findIndex(function(x){ return x.id===p.id; });
+      if(si===-1||ti===-1) return;
+      var moved=photos.splice(si,1)[0]; photos.splice(ti,0,moved); renderGallery(); saveState();
     });
     grid.appendChild(card);
   });
 }
 
 function filterGallery(cat){
-  currentFilter = cat;
-  document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.cat === cat); });
+  currentFilter=cat;
+  document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.cat===cat); });
   renderGallery();
 }
+function deletePhoto(id){ if(!confirm('Remove this photo?')) return; photos=photos.filter(function(p){ return p.id!==id; }); renderGallery(); saveState(); }
 
-function deletePhotoById(id){
-  if(!confirm('Permanently remove this photo?')) return;
-  photos = photos.filter(function(p){ return p.id !== id; });
-  pmSelectedIds = pmSelectedIds.filter(function(x){ return x !== id; });
-  renderGallery(); renderPhotoManager(); renderVisSummary();
+// ─── SELECT MODE ──────────────────────────────────────────────
+function toggleSelectMode(){
+  selectMode=!selectMode;
+  document.body.classList.toggle('compcard-mode', selectMode);
+  document.getElementById('select-hint').style.display=selectMode?'block':'none';
+  document.getElementById('select-photos-btn').textContent=selectMode?'Done selecting':'Select for model book';
+  renderGallery();
 }
+function enterSelectMode(){ if(!selectMode) toggleSelectMode(); document.getElementById('gallery').scrollIntoView({behavior:'smooth'}); }
 
-// ─── PHOTO MANAGER ────────────────────────────────────────────
-function pmFilterChange(){ pmSelectedIds = []; renderPhotoManager(); }
-
-function getPmFiltered(){
-  var catF = document.getElementById('pm-filter').value;
-  var visF = document.getElementById('pm-vis-filter').value;
-  return photos.filter(function(p){
-    if(catF !== 'all' && p.cat !== catF) return false;
-    if(visF === 'public' && !isPhotoPublic(p)) return false;
-    if(visF === 'hidden' && isPhotoPublic(p)) return false;
-    return true;
-  });
-}
-
-function renderPhotoManager(){
-  var list = document.getElementById('photo-manager-list');
-  if(!list) return;
-  var filtered = getPmFiltered();
-
-  if(!filtered.length){
-    list.innerHTML = '<p style="font-size:0.75rem;color:#555;padding:0.4rem 0;">No photos match this filter.</p>';
-    updateSelBar(); return;
-  }
-
-  list.innerHTML = '';
-  filtered.forEach(function(p){
-    var pub = isPhotoPublic(p);
-    var isSel = pmSelectedIds.indexOf(p.id) !== -1;
-    var row = document.createElement('div');
-    row.className = 'photo-manager-item' + (isSel ? ' pm-selected' : '');
-    row.dataset.id = p.id;
-
-    var cb = document.createElement('div'); cb.className = 'pm-checkbox'; cb.innerHTML = isSel ? '✓' : '';
-    if(p.src){
-      var th = document.createElement('img'); th.className = 'pm-thumb'; th.src = p.src; row.appendChild(cb); row.appendChild(th);
-    } else {
-      var th = document.createElement('div'); th.className = 'pm-thumb-empty'; row.appendChild(cb); row.appendChild(th);
-    }
-    var info = document.createElement('div'); info.className = 'pm-info';
-    info.innerHTML = '<div class="pm-name">'+p.title+'</div><div class="pm-cat">'+p.cat+'</div>';
-    var vis = document.createElement('span');
-    vis.className = 'pm-vis ' + (pub ? 'visible' : 'hidden');
-    vis.textContent = pub ? 'Public' : 'Hidden';
-    var del = document.createElement('button'); del.className = 'pm-del-single'; del.innerHTML = '×'; del.title = 'Delete';
-    del.onclick = function(e){ e.stopPropagation(); deletePhotoById(p.id); };
-
-    row.appendChild(info); row.appendChild(vis); row.appendChild(del);
-
-    row.onclick = function(){
-      var idx = pmSelectedIds.indexOf(p.id);
-      if(idx === -1) pmSelectedIds.push(p.id);
-      else pmSelectedIds.splice(idx, 1);
-      renderPhotoManager();
-    };
-    list.appendChild(row);
-  });
-  updateSelBar();
-}
-
-function updateSelBar(){
-  var bar = document.getElementById('pm-sel-bar');
-  var count = document.getElementById('pm-sel-count');
-  if(!bar || !count) return;
-  if(pmSelectedIds.length > 0){
-    bar.style.display = 'flex';
-    count.textContent = pmSelectedIds.length + ' selected';
+function togglePhotoSelect(id, badge){
+  var p=photos.find(function(x){ return x.id===id; });
+  if(!p||!p.src){ alert('Upload a real photo first — placeholders cannot be used.'); return; }
+  var idx=ccSlots.findIndex(function(s){ return s && s.photoId===id; });
+  if(idx!==-1){
+    ccSlots[idx]={photoId:null,src:null,offsetX:0,offsetY:0,scale:1,role:SLOT_ROLES[idx].key};
+    badge.classList.remove('selected');
   } else {
-    bar.style.display = 'none';
+    var empty=ccSlots.findIndex(function(s){ return !s.src; });
+    if(empty===-1){ alert('All 5 slots are filled. Remove one first.'); return; }
+    ccSlots[empty]={photoId:id,src:p.src,offsetX:0,offsetY:0,scale:1,role:SLOT_ROLES[empty].key};
+    badge.classList.add('selected');
   }
+  document.getElementById('selected-count').textContent=ccSlots.filter(function(s){ return s.src; }).length;
+  renderSlotList(); renderCanvas(); saveState();
 }
 
-function pmSelectAll(){
-  pmSelectedIds = getPmFiltered().map(function(p){ return p.id; });
-  renderPhotoManager();
-}
-function pmSelectNone(){ pmSelectedIds = []; renderPhotoManager(); }
-function pmSelectPublic(){
-  pmSelectedIds = getPmFiltered().filter(function(p){ return isPhotoPublic(p); }).map(function(p){ return p.id; });
-  renderPhotoManager();
-}
-function pmSelectHidden(){
-  pmSelectedIds = getPmFiltered().filter(function(p){ return !isPhotoPublic(p); }).map(function(p){ return p.id; });
-  renderPhotoManager();
-}
-
-function pmSetVisibility(makePublic){
-  if(!pmSelectedIds.length){ alert('No photos selected.'); return; }
-  photos.forEach(function(p){
-    if(pmSelectedIds.indexOf(p.id) !== -1) p.publicOverride = makePublic ? true : false;
+// ─── SLOT LIST ────────────────────────────────────────────────
+function renderSlotList(){
+  var c=document.getElementById('photo-slots'); c.innerHTML='';
+  ccSlots.forEach(function(s, i){
+    var role=SLOT_ROLES[i];
+    var row=document.createElement('div');
+    row.className='photo-slot'+(activeSlotIdx===i?' active-slot':'');
+    if(s.src){
+      var thumb=document.createElement('img'); thumb.className='slot-thumb'; thumb.src=s.src; row.appendChild(thumb);
+    } else {
+      var empty=document.createElement('div'); empty.className='slot-thumb-empty'; empty.textContent=i+1; row.appendChild(empty);
+    }
+    var info=document.createElement('div'); info.className='slot-info';
+    info.innerHTML='<div class="slot-name">'+role.label+'</div><div class="slot-role" style="color:'+role.tc+';">'+(s.src?'Photo assigned':'Empty — click to assign')+'</div>';
+    var rm=document.createElement('button'); rm.className='slot-remove'; rm.innerHTML='×';
+    rm.onclick=function(e){
+      e.stopPropagation();
+      ccSlots[i]={photoId:null,src:null,offsetX:0,offsetY:0,scale:1,role:role.key};
+      if(activeSlotIdx===i){ activeSlotIdx=null; renderCropPanel(); }
+      renderSlotList(); renderGallery(); renderCanvas(); saveState();
+    };
+    row.onclick=function(){ activeSlotIdx=i; renderSlotList(); renderCropPanel(); };
+    row.appendChild(info); row.appendChild(rm); c.appendChild(row);
   });
-  pmSelectedIds = [];
-  renderGallery(); renderPhotoManager(); renderVisSummary();
 }
 
-function pmDeleteSelected(){
-  if(!pmSelectedIds.length){ alert('No photos selected.'); return; }
-  var n = pmSelectedIds.length;
-  if(!confirm('Permanently delete ' + n + ' photo' + (n > 1 ? 's' : '') + '?')) return;
-  photos = photos.filter(function(p){ return pmSelectedIds.indexOf(p.id) === -1; });
-  pmSelectedIds = [];
-  renderGallery(); renderPhotoManager(); renderVisSummary();
+// ─── CROP PANEL ───────────────────────────────────────────────
+function renderCropPanel(){
+  var panel=document.getElementById('crop-panel');
+  if(activeSlotIdx===null||!ccSlots[activeSlotIdx]||!ccSlots[activeSlotIdx].src){
+    panel.innerHTML='<p style="font-size:0.75rem;color:#555;">Click a photo slot above to adjust it.</p>'; return;
+  }
+  var s=ccSlots[activeSlotIdx];
+  panel.innerHTML='<div style="font-size:0.72rem;color:#666;margin-bottom:0.5rem;">Adjusting: '+SLOT_ROLES[activeSlotIdx].label+'</div><div class="crop-controls"><div class="crop-row"><span class="crop-lbl">Scale</span><input type="range" class="crop-slider" min="50" max="300" value="'+Math.round(s.scale*100)+'" oninput="updateCrop(\'scale\',this.value/100);document.getElementById(\'cv-sc\').textContent=this.value+\'%\'"><span class="crop-val" id="cv-sc">'+Math.round(s.scale*100)+'%</span></div><div class="crop-row"><span class="crop-lbl">Offset X</span><input type="range" class="crop-slider" min="-200" max="200" value="'+s.offsetX+'" oninput="updateCrop(\'offsetX\',+this.value);document.getElementById(\'cv-ox\').textContent=this.value"><span class="crop-val" id="cv-ox">'+s.offsetX+'</span></div><div class="crop-row"><span class="crop-lbl">Offset Y</span><input type="range" class="crop-slider" min="-200" max="200" value="'+s.offsetY+'" oninput="updateCrop(\'offsetY\',+this.value);document.getElementById(\'cv-oy\').textContent=this.value"><span class="crop-val" id="cv-oy">'+s.offsetY+'</span></div></div>';
+}
+function updateCrop(prop, val){ if(activeSlotIdx===null) return; ccSlots[activeSlotIdx][prop]=val; renderCanvas(); saveState(); }
+function clearAllSlots(){
+  ccSlots=SLOT_ROLES.map(function(r){ return {photoId:null,src:null,offsetX:0,offsetY:0,scale:1,role:r.key}; });
+  activeSlotIdx=null; renderSlotList(); renderCropPanel(); renderGallery(); renderCanvas(); saveState();
 }
 
-// ─── VISIBILITY LIMITS ────────────────────────────────────────
-function applyLimits(){
-  CATS.forEach(function(cat){
-    var el = document.getElementById('limit-'+cat);
-    var val = parseInt(el.value);
-    if(isNaN(val)||val<0) val=0;
-    if(val>50) val=50;
-    el.value = val;
-    visLimits[cat] = val;
+// ─── TEMPLATE GRID ────────────────────────────────────────────
+function buildTemplateGrid(){
+  var grid=document.getElementById('template-grid');
+  var colors=['#3a3a5a','#2a4a2a','#3a3a3a','#3a2a4a','#4a3a2a'];
+  TEMPLATES.forEach(function(t, i){
+    var btn=document.createElement('button');
+    btn.className='tmpl-btn'+(i===0?' active':''); btn.title=t.name;
+    var prev=document.createElement('div'); prev.className='tmpl-preview';
+    var zones=t.zones();
+    zones.forEach(function(r, j){
+      var blk=document.createElement('div'); blk.className='tmpl-block';
+      blk.style.cssText='left:'+r.x*100+'%;top:'+r.y*100+'%;width:'+r.w*100+'%;height:'+r.h*100+'%;background:'+colors[j%5]+';';
+      prev.appendChild(blk);
+    });
+    var num=document.createElement('div'); num.className='tmpl-num'; num.textContent=t.name;
+    btn.appendChild(prev); btn.appendChild(num);
+    btn.onclick=function(){
+      currentTemplate=i;
+      document.querySelectorAll('.tmpl-btn').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active'); renderCanvas(); saveState();
+    };
+    grid.appendChild(btn);
   });
-  renderGallery(); renderVisSummary(); renderPhotoManager();
 }
 
-function renderVisSummary(){
-  var el = document.getElementById('vis-summary');
-  if(!el) return;
-  var html = '';
-  CATS.forEach(function(cat){
-    var total = photos.filter(function(p){ return p.cat===cat; }).length;
-    var shown = photos.filter(function(p){ return p.cat===cat && isPhotoPublic(p); }).length;
-    var pct = total > 0 ? Math.round(shown/total*100) : 0;
-    var label = cat.charAt(0).toUpperCase()+cat.slice(1);
-    html += '<div style="margin-bottom:0.8rem;">';
-    html += '<div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span style="font-size:0.75rem;color:#aaa;">'+label+'</span><span style="font-size:0.72rem;color:#666;">'+shown+' / '+total+' public</span></div>';
-    html += '<div class="vis-bar"><div class="vis-bar-fill" style="width:'+pct+'%"></div></div></div>';
+// ─── CANVAS RENDER ────────────────────────────────────────────
+function renderCanvas(){
+  var canvas=document.getElementById('comp-canvas');
+  var ctx=canvas.getContext('2d');
+  var tmpl=TEMPLATES[currentTemplate];
+  var bg=document.getElementById('cc-bg').value;
+  var accent=document.getElementById('cc-accent').value;
+  var nameFont=document.getElementById('cc-name-font').value;
+  var nameSize=parseInt(document.getElementById('cc-name-size').value)||40;
+  var nameColor=document.getElementById('cc-name-color').value;
+  var statsFont=document.getElementById('cc-stats-font').value;
+  var statsSize=parseInt(document.getElementById('cc-stats-size').value)||14;
+  var statsColor=document.getElementById('cc-stats-color').value;
+  var nameText=document.getElementById('cc-name').value;
+  var statsLines=document.getElementById('cc-stats').value.split('\n');
+  var zones=tmpl.zones();
+  var textStartY=tmpl.textY*CH;
+
+  ctx.fillStyle=bg; ctx.fillRect(0,0,CW,CH);
+
+  var imgPromises=zones.map(function(r, i){
+    var slot=ccSlots[i];
+    if(!slot||!slot.src) return Promise.resolve({r:r,img:null,slot:null,i:i});
+    return new Promise(function(res){
+      var img=new Image(); img.crossOrigin='anonymous';
+      img.onload=function(){ res({r:r,img:img,slot:slot,i:i}); };
+      img.onerror=function(){ res({r:r,img:null,slot:null,i:i}); };
+      img.src=slot.src;
+    });
   });
-  el.innerHTML = html;
+
+  Promise.all(imgPromises).then(function(results){
+    ctx.fillStyle=bg; ctx.fillRect(0,0,CW,CH);
+    results.forEach(function(item){
+      var r=item.r, img=item.img, slot=item.slot, i=item.i;
+      var px=Math.round(r.x*CW), py=Math.round(r.y*CH), pw=Math.round(r.w*CW), ph=Math.round(r.h*CH);
+      if(img&&slot){
+        ctx.save(); ctx.beginPath(); ctx.rect(px,py,pw,ph); ctx.clip();
+        var sc=slot.scale, dw=pw*sc, dh=ph*sc;
+        var dx=px+(pw-dw)/2+slot.offsetX, dy=py+(ph-dh)/2+slot.offsetY;
+        if(i===2){
+          var offscreen=document.createElement('canvas'); offscreen.width=CW; offscreen.height=CH;
+          var otx=offscreen.getContext('2d'); otx.drawImage(img,dx,dy,dw,dh);
+          var id=otx.getImageData(px,py,pw,ph), d=id.data;
+          for(var k=0;k<d.length;k+=4){ var gray=0.299*d[k]+0.587*d[k+1]+0.114*d[k+2]; d[k]=d[k+1]=d[k+2]=gray; }
+          otx.putImageData(id,px,py); ctx.drawImage(offscreen,0,0);
+        } else { ctx.drawImage(img,dx,dy,dw,dh); }
+        ctx.restore();
+        var role=SLOT_ROLES[i];
+        ctx.save(); ctx.font='600 9px Helvetica Neue,sans-serif';
+        var lbl=role.label.toUpperCase(), lw=ctx.measureText(lbl).width;
+        ctx.fillStyle='rgba(0,0,0,0.55)'; ctx.fillRect(px+4,py+4,lw+8,14);
+        ctx.fillStyle=role.tc; ctx.fillText(lbl,px+8,py+14); ctx.restore();
+      } else {
+        ctx.fillStyle='#1c1c1c'; ctx.fillRect(px,py,pw,ph);
+        ctx.fillStyle='#2a2a2a'; ctx.fillRect(px+1,py+1,pw-2,ph-2);
+        var role=SLOT_ROLES[i];
+        ctx.font='500 11px Helvetica Neue,sans-serif'; ctx.fillStyle=role.tc;
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(role.label,px+pw/2,py+ph/2);
+        ctx.textAlign='left'; ctx.textBaseline='top';
+      }
+    });
+    ctx.fillStyle=accent; ctx.fillRect(30,textStartY-6,CW-60,1);
+    ctx.font='700 '+nameSize+'px '+nameFont; ctx.fillStyle=nameColor;
+    ctx.textAlign='left'; ctx.textBaseline='top';
+    ctx.fillText(nameText,30,textStartY);
+    ctx.font='400 '+statsSize+'px '+statsFont; ctx.fillStyle=statsColor;
+    statsLines.forEach(function(line, li){ ctx.fillText(line,30,textStartY+nameSize+10+li*(statsSize+5)); });
+  });
 }
 
-// ─── PANEL TABS ───────────────────────────────────────────────
-function switchTab(id){
-  document.querySelectorAll('.panel-tab-content').forEach(function(el){ el.classList.remove('active'); });
-  document.querySelectorAll('.panel-tab').forEach(function(el){ el.classList.remove('active'); });
-  document.getElementById(id).classList.add('active');
-  var tabs = ['tab-profile','tab-photos','tab-settings'];
-  document.querySelectorAll('.panel-tab')[tabs.indexOf(id)].classList.add('active');
-  if(id==='tab-settings') renderVisSummary();
-  if(id==='tab-photos'){ pmSelectedIds=[]; renderPhotoManager(); }
+// ─── EXPORT ───────────────────────────────────────────────────
+function exportCanvas(type){
+  renderCanvas();
+  setTimeout(function(){
+    var canvas=document.getElementById('comp-canvas');
+    if(type==='img'){
+      var a=document.createElement('a'); a.href=canvas.toDataURL('image/png'); a.download='modelbook_divin_gangbo.png'; a.click();
+    } else {
+      var jsPDF=window.jspdf.jsPDF;
+      var pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+      var imgData=canvas.toDataURL('image/png');
+      var pw=pdf.internal.pageSize.getWidth(), ph=pdf.internal.pageSize.getHeight();
+      var cr=CW/CH, iw=pw-20, ih=iw/cr;
+      if(ih>ph-20){ ih=ph-20; iw=ih*cr; }
+      pdf.addImage(imgData,'PNG',(pw-iw)/2,10,iw,ih);
+      pdf.save('modelbook_divin_gangbo.pdf');
+    }
+  }, 400);
+}
+
+function exportInfoCard(type){
+  var wrapper=document.getElementById('info-comp-card').closest('.comp-card-info');
+  html2canvas(wrapper,{backgroundColor:'#111111',scale:2}).then(function(canvas){
+    if(type==='img'){
+      var a=document.createElement('a'); a.href=canvas.toDataURL('image/png'); a.download='infocard_divin_gangbo.png'; a.click();
+    } else {
+      var jsPDF=window.jspdf.jsPDF;
+      var pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+      var imgData=canvas.toDataURL('image/png'), pw=pdf.internal.pageSize.getWidth();
+      pdf.addImage(imgData,'PNG',10,10,pw-20,(pw-20)*canvas.height/canvas.width);
+      pdf.save('infocard_divin_gangbo.pdf');
+    }
+  });
+}
+
+// ─── UPLOAD TO SLOT ───────────────────────────────────────────
+function uploadToSlot(e){
+  var file=e.target.files[0]; if(!file) return;
+  var empty=ccSlots.findIndex(function(s){ return !s.src; });
+  if(empty===-1){ alert('All 5 slots are filled. Remove one first.'); return; }
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    ccSlots[empty]={photoId:null,src:ev.target.result,offsetX:0,offsetY:0,scale:1,role:SLOT_ROLES[empty].key};
+    renderSlotList(); renderCanvas(); saveState();
+  };
+  reader.readAsDataURL(file); e.target.value='';
 }
 
 // ─── MANAGE ───────────────────────────────────────────────────
 function previewUpload(e){
-  var file = e.target.files[0]; if(!file) return;
-  var reader = new FileReader();
-  reader.onload = function(ev){
-    uploadedSrc = ev.target.result;
-    var prev = document.getElementById('upload-preview'); prev.src=uploadedSrc; prev.style.display='block';
+  var file=e.target.files[0]; if(!file) return;
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    uploadedSrc=ev.target.result;
+    var prev=document.getElementById('upload-preview'); prev.src=uploadedSrc; prev.style.display='block';
     document.querySelector('.upload-icon').style.display='none';
     document.querySelector('.upload-hint').style.display='none';
   };
@@ -695,18 +864,16 @@ function previewUpload(e){
 }
 
 function addPhoto(){
-  var title = document.getElementById('photo-title').value.trim()||'New Photo';
-  var cat = document.getElementById('photo-cat').value;
-  var catCount = photos.filter(function(p){ return p.cat===cat; }).length;
-  if(catCount>=50){ alert('Maximum 50 photos per category reached.'); return; }
-  photos.push({id:nextId++, title:title, cat:cat, src:uploadedSrc, publicOverride:null});
-  uploadedSrc = null;
+  var title=document.getElementById('photo-title').value.trim()||'New Photo';
+  var cat=document.getElementById('photo-cat').value;
+  photos.push({id:nextId++,title:title,cat:cat,src:uploadedSrc});
+  uploadedSrc=null;
   document.getElementById('photo-title').value='';
-  var prev = document.getElementById('upload-preview'); prev.src=''; prev.style.display='none';
+  var prev=document.getElementById('upload-preview'); prev.src=''; prev.style.display='none';
   document.querySelector('.upload-icon').style.display='block';
   document.querySelector('.upload-hint').style.display='block';
   document.getElementById('upload-zone').querySelector('input').value='';
-  renderGallery(); renderPhotoManager(); renderVisSummary();
+  renderGallery(); saveState();
   if(currentFilter!=='all'&&currentFilter!==cat) filterGallery('all');
 }
 
@@ -719,66 +886,64 @@ function saveProfile(){
   document.getElementById('nav-name').textContent=name;
   document.getElementById('hero-name').innerHTML=name.replace(' ','<br>');
   document.getElementById('comp-name').textContent=name;
-  if(bio){document.getElementById('hero-bio').textContent=bio;document.getElementById('about-bio').textContent=bio;}
-  if(height){document.getElementById('stat-height').textContent=height;document.getElementById('comp-height').textContent=height;}
+  if(bio){ document.getElementById('hero-bio').textContent=bio; document.getElementById('about-bio').textContent=bio; }
+  if(height){ document.getElementById('stat-height').textContent=height; document.getElementById('comp-height').textContent=height; }
   if(meas) document.getElementById('stat-measurements').textContent=meas;
-  if(eyes){document.getElementById('stat-eyes').textContent=eyes;document.getElementById('comp-eyes').textContent=eyes;}
+  if(eyes){ document.getElementById('stat-eyes').textContent=eyes; document.getElementById('comp-eyes').textContent=eyes; }
   document.getElementById('footer-copy').textContent='© 2025 '+name+'. All rights reserved.';
-  var btn=event.target; btn.textContent='Saved ✓'; setTimeout(function(){btn.textContent='Save profile';},1800);
+  var btn=event.target; btn.textContent='Saved ✓'; setTimeout(function(){ btn.textContent='Save profile'; },1800);
+  saveState();
 }
 
 function changePassword(){
   var val=document.getElementById('new-pw').value.trim(); if(!val) return;
   adminPassword=val; document.getElementById('new-pw').value='';
-  var btn=event.target; btn.textContent='Updated ✓'; setTimeout(function(){btn.textContent='Update password';},1800);
+  var btn=event.target; btn.textContent='Updated ✓'; setTimeout(function(){ btn.textContent='Update password'; },1800);
+  saveState();
 }
 
 function openPasswordModal(){
   document.getElementById('pw-input').value='';
   document.getElementById('pw-error').style.display='none';
   document.getElementById('pw-modal').classList.add('open');
-  setTimeout(function(){document.getElementById('pw-input').focus();},100);
+  setTimeout(function(){ document.getElementById('pw-input').focus(); },100);
 }
-function closePasswordModal(){document.getElementById('pw-modal').classList.remove('open');}
+function closePasswordModal(){ document.getElementById('pw-modal').classList.remove('open'); }
 function checkPassword(){
-  if(document.getElementById('pw-input').value===adminPassword){closePasswordModal();openManagePanel();}
-  else{document.getElementById('pw-error').style.display='block';document.getElementById('pw-input').value='';document.getElementById('pw-input').focus();}
+  if(document.getElementById('pw-input').value===adminPassword){ closePasswordModal(); openManagePanel(); }
+  else{ document.getElementById('pw-error').style.display='block'; document.getElementById('pw-input').value=''; document.getElementById('pw-input').focus(); }
 }
-function openManagePanel(){document.getElementById('manage-panel').classList.add('open');document.body.classList.add('manage-mode');renderGallery();}
-function toggleManage(){document.getElementById('manage-panel').classList.remove('open');document.body.classList.remove('manage-mode');renderGallery();}
-
-// ─── EXPORT ───────────────────────────────────────────────────
-function exportInfoCard(type){
-  var wrapper=document.getElementById('info-comp-card').closest('.comp-card-info');
-  html2canvas(wrapper,{backgroundColor:'#111111',scale:2}).then(function(canvas){
-    if(type==='img'){var a=document.createElement('a');a.href=canvas.toDataURL('image/png');a.download='infocard_divin_gangbo.png';a.click();}
-    else{var jsPDF=window.jspdf.jsPDF;var pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});var imgData=canvas.toDataURL('image/png');var pw=pdf.internal.pageSize.getWidth();pdf.addImage(imgData,'PNG',10,10,pw-20,(pw-20)*canvas.height/canvas.width);pdf.save('infocard_divin_gangbo.pdf');}
-  });
-}
+function openManagePanel(){ document.getElementById('manage-panel').classList.add('open'); document.body.classList.add('manage-mode'); }
+function toggleManage(){ document.getElementById('manage-panel').classList.remove('open'); document.body.classList.remove('manage-mode'); }
 
 // ─── LIGHTBOX ─────────────────────────────────────────────────
 function openLightbox(idx){
-  var vis=getVisible().filter(function(p){return p.src&&isPhotoPublic(p);});
-  if(!vis.length) return;
+  var vis=getVisible().filter(function(p){ return p.src; }); if(!vis.length) return;
   currentLightboxIndex=Math.min(idx,vis.length-1);
   document.getElementById('lb-img').src=vis[currentLightboxIndex].src;
   document.getElementById('lightbox').classList.add('open');
 }
-function closeLightbox(){document.getElementById('lightbox').classList.remove('open');}
+function closeLightbox(){ document.getElementById('lightbox').classList.remove('open'); }
 function lightboxNav(dir){
-  var lp=getVisible().filter(function(p){return p.src&&isPhotoPublic(p);});
-  if(!lp.length) return;
+  var lp=getVisible().filter(function(p){ return p.src; }); if(!lp.length) return;
   currentLightboxIndex=(currentLightboxIndex+dir+lp.length)%lp.length;
   document.getElementById('lb-img').src=lp[currentLightboxIndex].src;
 }
 document.addEventListener('keydown',function(e){
-  if(e.key==='Escape'){closeLightbox();closePasswordModal();}
+  if(e.key==='Escape'){ closeLightbox(); closePasswordModal(); }
   if(e.key==='ArrowLeft') lightboxNav(-1);
   if(e.key==='ArrowRight') lightboxNav(1);
 });
 
-// ─── INIT ─────────────────────────────────────────────────────
-renderGallery();
+// ─── BOOT: sync from server first, then restore state and render ─────
+(function boot() {
+  _pfSyncFromServer().then(function() {
+    _pfRestoreState();
+    renderGallery();
+    if(typeof renderSlotList==='function') renderSlotList();
+    if(typeof renderCanvas==='function') renderCanvas();
+  });
+})();
 </script>
 </body>
 </html>
