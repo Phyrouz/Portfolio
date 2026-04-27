@@ -187,7 +187,7 @@ footer{padding:2rem 2.5rem;border-top:0.5px solid #1a1a1a;display:flex;justify-c
 <div id="manage-banner">Manage mode active — drag ⠿ to reorder, × to remove, or use the panel to add photos.</div>
 
 <nav>
-  <div class="nav-logo" id="nav-name">Divin Gangbo <span id="pf-sync-dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#999;margin-left:4px;vertical-align:middle;cursor:help;" title="Sync status"></span></div>
+  <div class="nav-logo"><span id="nav-name">Divin Gangbo</span> <span id="pf-sync-dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#999;margin-left:4px;vertical-align:middle;cursor:help;" title="Sync status"></span></div>
   <div class="nav-links">
     <a href="#about">About</a><a href="#gallery">Portfolio</a><a href="#contact">Contact</a>
   </div>
@@ -405,8 +405,10 @@ function _pfSyncFromServer() {
       if (keys.length > 0) {
         keys.forEach(function(k) { localStorage.setItem(k, data[k]); });
         console.log('Portfolio: synced ' + keys.length + ' keys from server.');
+        _pfSyncDot('#2d7a3a', 'Synced \u2713');
+      } else {
+        _pfSyncDot('#2d7a3a', 'Connected');
       }
-      _pfSyncDot('#2d7a3a', 'Connected');
     })
     .catch(function(e) {
       console.log('Server unavailable, using local data:', e.message);
