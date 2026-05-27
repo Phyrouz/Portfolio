@@ -573,6 +573,12 @@ var currentFilter = 'all';
 var currentLightboxIndex = 0;
 var dragSrcId = null;
 var uploadedSrc = null;
+var uploadedFile = null;
+
+// ─── CLOUDINARY CONFIG ────────────────────────────────────────
+var CL_CLOUD = 'dtbzxl2iw';
+var CL_PRESET = 'smxdbdh2';
+var CL_URL = 'https://api.cloudinary.com/v1_1/' + CL_CLOUD + '/image/upload';
 var selectMode = false;
 var ccSlots = SLOT_ROLES.map(function(r){ return {photoId:null,src:null,offsetX:0,offsetY:0,scale:1,role:r.key}; });
 var activeSlotIdx = null;
@@ -844,39 +850,65 @@ function uploadToSlot(e){
   var file=e.target.files[0]; if(!file) return;
   var empty=ccSlots.findIndex(function(s){ return !s.src; });
   if(empty===-1){ alert('All 5 slots are filled. Remove one first.'); return; }
-  var reader=new FileReader();
-  reader.onload=function(ev){
-    ccSlots[empty]={photoId:null,src:ev.target.result,offsetX:0,offsetY:0,scale:1,role:SLOT_ROLES[empty].key};
-    renderSlotList(); renderCanvas(); saveState();
-  };
-  reader.readAsDataURL(file); e.target.value='';
+  e.target.value='';
+
+  var fd=new FormData();
+  fd.append('file', file);
+  fd.append('upload_preset', CL_PRESET);
+
+  fetch(CL_URL, {method:'POST', body:fd})
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(!data.secure_url) throw new Error('Upload failed');
+      ccSlots[empty]={photoId:null,src:data.secure_url,offsetX:0,offsetY:0,scale:1,role:SLOT_ROLES[empty].key};
+      renderSlotList(); renderCanvas(); saveState();
+    })
+    .catch(function(err){ alert('Upload failed: ' + err.message); });
 }
 
 // ─── MANAGE ───────────────────────────────────────────────────
 function previewUpload(e){
   var file=e.target.files[0]; if(!file) return;
-  var reader=new FileReader();
-  reader.onload=function(ev){
-    uploadedSrc=ev.target.result;
-    var prev=document.getElementById('upload-preview'); prev.src=uploadedSrc; prev.style.display='block';
-    document.querySelector('.upload-icon').style.display='none';
-    document.querySelector('.upload-hint').style.display='none';
-  };
-  reader.readAsDataURL(file);
+  uploadedFile = file;
+  var localUrl = URL.createObjectURL(file);
+  uploadedSrc = localUrl; // temporary local preview
+  var prev=document.getElementById('upload-preview'); prev.src=localUrl; prev.style.display='block';
+  document.querySelector('.upload-icon').style.display='none';
+  document.querySelector('.upload-hint').style.display='none';
 }
 
 function addPhoto(){
+  if(!uploadedFile){ alert('Please select an image first.'); return; }
   var title=document.getElementById('photo-title').value.trim()||'New Photo';
   var cat=document.getElementById('photo-cat').value;
-  photos.push({id:nextId++,title:title,cat:cat,src:uploadedSrc});
-  uploadedSrc=null;
-  document.getElementById('photo-title').value='';
-  var prev=document.getElementById('upload-preview'); prev.src=''; prev.style.display='none';
-  document.querySelector('.upload-icon').style.display='block';
-  document.querySelector('.upload-hint').style.display='block';
-  document.getElementById('upload-zone').querySelector('input').value='';
-  renderGallery(); saveState();
-  if(currentFilter!=='all'&&currentFilter!==cat) filterGallery('all');
+
+  // Show uploading state
+  var addBtn=document.querySelector('.btn-add');
+  addBtn.textContent='Uploading…'; addBtn.disabled=true;
+
+  var fd=new FormData();
+  fd.append('file', uploadedFile);
+  fd.append('upload_preset', CL_PRESET);
+
+  fetch(CL_URL, {method:'POST', body:fd})
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(!data.secure_url) throw new Error('Upload failed');
+      photos.push({id:nextId++, title:title, cat:cat, src:data.secure_url});
+      uploadedSrc=null; uploadedFile=null;
+      document.getElementById('photo-title').value='';
+      var prev=document.getElementById('upload-preview'); prev.src=''; prev.style.display='none';
+      document.querySelector('.upload-icon').style.display='block';
+      document.querySelector('.upload-hint').style.display='block';
+      document.getElementById('upload-zone').querySelector('input').value='';
+      renderGallery(); saveState();
+      if(currentFilter!=='all'&&currentFilter!==cat) filterGallery('all');
+      addBtn.textContent='+ Add to portfolio'; addBtn.disabled=false;
+    })
+    .catch(function(err){
+      alert('Upload to Cloudinary failed: ' + err.message);
+      addBtn.textContent='+ Add to portfolio'; addBtn.disabled=false;
+    });
 }
 
 function saveProfile(){
