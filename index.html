@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Divin Gangbo — Portfolio v1.1</title>
+<title>Divin Gangbo — Portfolio v1.2</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
@@ -148,7 +148,24 @@ body.compcard-mode .select-badge{display:flex;}
 .upload-preview{width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:2px;display:none;}
 .btn-add{background:#f0f0f0;color:#0a0a0a;border:none;padding:0.85rem;font-size:0.82rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border-radius:2px;width:100%;}
 .btn-add:hover{background:#ccc;}
+.btn-add:disabled{background:#333;color:#666;cursor:not-allowed;}
 .panel-divider{border:none;border-top:0.5px solid #222;}
+.bulk-drop{border:1px dashed #333;border-radius:2px;padding:1.2rem;text-align:center;cursor:pointer;transition:border-color 0.15s;}
+.bulk-drop.drag-over{border-color:#888;background:#1a1a1a;}
+.bulk-drop input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.bulk-drop-inner{position:relative;}
+.bulk-cat-row{display:flex;align-items:center;gap:0.6rem;margin-top:0.6rem;}
+.bulk-cat-row label{font-size:0.75rem;color:#777;white-space:nowrap;letter-spacing:0.06em;text-transform:uppercase;}
+.bulk-cat-row select{flex:1;}
+.bulk-queue{margin-top:0.8rem;display:flex;flex-direction:column;gap:0.4rem;max-height:200px;overflow-y:auto;}
+.bulk-item{display:flex;align-items:center;gap:0.5rem;font-size:0.75rem;padding:0.4rem 0.5rem;background:#1a1a1a;border-radius:2px;}
+.bulk-item-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#bbb;}
+.bulk-item-status{font-size:0.7rem;white-space:nowrap;letter-spacing:0.04em;}
+.bulk-item-status.pending{color:#555;}
+.bulk-item-status.uploading{color:#f0c040;}
+.bulk-item-status.done{color:#4caf50;}
+.bulk-item-status.error{color:#e53935;}
+.bulk-progress{margin-top:0.6rem;font-size:0.75rem;color:#888;text-align:center;letter-spacing:0.04em;min-height:1.2em;}
 .panel-info{font-size:0.78rem;color:#555;line-height:1.6;}
 .profile-edit-row{display:flex;gap:0.6rem;}
 .profile-edit-row .panel-input{flex:1;}
@@ -187,7 +204,7 @@ footer{padding:2rem 2.5rem;border-top:0.5px solid #1a1a1a;display:flex;justify-c
 <div id="manage-banner">Manage mode active — drag ⠿ to reorder, × to remove, or use the panel to add photos.</div>
 
 <nav>
-  <div class="nav-logo"><span id="nav-name">Divin Gangbo</span> <span id="pf-sync-dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#999;margin-left:4px;vertical-align:middle;cursor:help;" title="Sync status"></span></div>
+  <div class="nav-logo"><span id="nav-name">Divin Gangbo</span> <span id="pf-sync-dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#999;margin-left:4px;vertical-align:middle;cursor:help;" title="Sync status"></span><span style="font-size:0.6rem;color:#444;letter-spacing:0.08em;margin-left:8px;vertical-align:middle;font-weight:400;">v1.2</span></div>
   <div class="nav-links">
     <a href="#about">About</a><a href="#gallery">Portfolio</a><a href="#contact">Contact</a>
   </div>
@@ -348,6 +365,29 @@ footer{padding:2rem 2.5rem;border-top:0.5px solid #1a1a1a;display:flex;justify-c
         <option value="portrait">Portrait</option>
       </select>
       <button class="btn-add" onclick="addPhoto()">+ Add to portfolio</button>
+    </div>
+    <hr class="panel-divider">
+    <div class="panel-section">
+      <span class="panel-label">Bulk upload</span>
+      <div class="bulk-drop" id="bulk-drop" ondragover="bulkDragOver(event)" ondragleave="bulkDragLeave(event)" ondrop="bulkDrop(event)">
+        <div class="bulk-drop-inner">
+          <input type="file" accept="image/*" multiple onchange="bulkFilePicked(event)">
+          <div class="upload-icon">↑↑</div>
+          <div class="upload-hint">Click or drag multiple images here</div>
+        </div>
+      </div>
+      <div class="bulk-cat-row">
+        <label>Category</label>
+        <select class="panel-select" id="bulk-cat">
+          <option value="editorial">Editorial</option>
+          <option value="sports">Sports</option>
+          <option value="casual">Casual</option>
+          <option value="portrait">Portrait</option>
+        </select>
+      </div>
+      <div class="bulk-queue" id="bulk-queue"></div>
+      <div class="bulk-progress" id="bulk-progress"></div>
+      <button class="btn-add" id="bulk-btn" onclick="bulkUpload()" style="margin-top:0.6rem;">↑ Upload all</button>
     </div>
     <hr class="panel-divider">
     <p class="panel-info">Drag ⠿ to reorder photos. × to remove. Changes apply instantly.</p>
@@ -858,9 +898,12 @@ function uploadToSlot(e){
   fd.append('upload_preset', CL_PRESET);
 
   fetch(CL_URL, {method:'POST', body:fd})
-    .then(function(r){ return r.json(); })
+    .then(function(r){
+      if(!r.ok) return r.text().then(function(t){ throw new Error('HTTP '+r.status+': '+t.slice(0,120)); });
+      return r.json();
+    })
     .then(function(data){
-      if(!data.secure_url) throw new Error('Upload failed');
+      if(!data.secure_url) throw new Error(data.error && data.error.message ? data.error.message : 'Upload failed');
       ccSlots[empty]={photoId:null,src:data.secure_url,offsetX:0,offsetY:0,scale:1,role:SLOT_ROLES[empty].key};
       renderSlotList(); renderCanvas(); saveState();
     })
@@ -892,9 +935,12 @@ function addPhoto(){
   fd.append('upload_preset', CL_PRESET);
 
   fetch(CL_URL, {method:'POST', body:fd})
-    .then(function(r){ return r.json(); })
+    .then(function(r){
+      if(!r.ok) return r.text().then(function(t){ throw new Error('HTTP '+r.status+': '+t.slice(0,120)); });
+      return r.json();
+    })
     .then(function(data){
-      if(!data.secure_url) throw new Error('Upload failed');
+      if(!data.secure_url) throw new Error(data.error && data.error.message ? data.error.message : 'Upload failed');
       photos.push({id:nextId++, title:title, cat:cat, src:data.secure_url});
       uploadedSrc=null; uploadedFile=null;
       document.getElementById('photo-title').value='';
@@ -910,6 +956,93 @@ function addPhoto(){
       alert('Upload to Cloudinary failed: ' + err.message);
       addBtn.textContent='+ Add to portfolio'; addBtn.disabled=false;
     });
+}
+
+// ─── BULK UPLOAD ──────────────────────────────────────────────
+var bulkFiles = [];
+
+function bulkRenderQueue(){
+  var q=document.getElementById('bulk-queue');
+  q.innerHTML='';
+  bulkFiles.forEach(function(f,i){
+    var row=document.createElement('div');
+    row.className='bulk-item';
+    row.id='bulk-item-'+i;
+    row.innerHTML='<span class="bulk-item-name">'+f.file.name+'</span>'
+      +'<span class="bulk-item-status pending" id="bulk-status-'+i+'">pending</span>';
+    q.appendChild(row);
+  });
+  document.getElementById('bulk-progress').textContent=bulkFiles.length ? bulkFiles.length+' file'+(bulkFiles.length>1?'s':'')+' queued' : '';
+  document.getElementById('bulk-btn').disabled=bulkFiles.length===0;
+}
+
+function bulkFilePicked(e){
+  var files=Array.from(e.target.files);
+  files.forEach(function(f){ bulkFiles.push({file:f,state:'pending'}); });
+  e.target.value='';
+  bulkRenderQueue();
+}
+
+function bulkDragOver(e){
+  e.preventDefault();
+  document.getElementById('bulk-drop').classList.add('drag-over');
+}
+function bulkDragLeave(){ document.getElementById('bulk-drop').classList.remove('drag-over'); }
+function bulkDrop(e){
+  e.preventDefault();
+  document.getElementById('bulk-drop').classList.remove('drag-over');
+  var files=Array.from(e.dataTransfer.files).filter(function(f){ return f.type.startsWith('image/'); });
+  files.forEach(function(f){ bulkFiles.push({file:f,state:'pending'}); });
+  bulkRenderQueue();
+}
+
+function bulkUpload(){
+  if(!bulkFiles.length) return;
+  var cat=document.getElementById('bulk-cat').value;
+  var btn=document.getElementById('bulk-btn');
+  btn.disabled=true; btn.textContent='Uploading…';
+  var total=bulkFiles.length, done=0, errors=0;
+
+  function uploadOne(i){
+    if(i>=bulkFiles.length){
+      btn.textContent='↑ Upload all'; btn.disabled=false;
+      document.getElementById('bulk-progress').textContent=
+        done+' uploaded'+(errors?' · '+errors+' failed':'');
+      if(done>0){ renderGallery(); saveState(); }
+      bulkFiles=bulkFiles.filter(function(f){ return f.state!=='done'; });
+      bulkRenderQueue();
+      return;
+    }
+    var item=bulkFiles[i];
+    var statusEl=document.getElementById('bulk-status-'+i);
+    statusEl.textContent='uploading'; statusEl.className='bulk-item-status uploading';
+    document.getElementById('bulk-progress').textContent='Uploading '+(i+1)+' / '+total+'…';
+
+    var fd=new FormData();
+    fd.append('file', item.file);
+    fd.append('upload_preset', CL_PRESET);
+
+    fetch(CL_URL, {method:'POST', body:fd})
+      .then(function(r){
+        if(!r.ok) return r.text().then(function(t){ throw new Error('HTTP '+r.status+': '+t.slice(0,120)); });
+        return r.json();
+      })
+      .then(function(data){
+        if(!data.secure_url) throw new Error(data.error&&data.error.message?data.error.message:'Upload failed');
+        var title=item.file.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' ');
+        photos.push({id:nextId++, title:title, cat:cat, src:data.secure_url});
+        item.state='done'; done++;
+        statusEl.textContent='done'; statusEl.className='bulk-item-status done';
+        uploadOne(i+1);
+      })
+      .catch(function(err){
+        item.state='error'; errors++;
+        statusEl.textContent='error'; statusEl.className='bulk-item-status error';
+        statusEl.title=err.message;
+        uploadOne(i+1);
+      });
+  }
+  uploadOne(0);
 }
 
 function saveProfile(){
