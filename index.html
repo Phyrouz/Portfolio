@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Divin Gangbo — Portfolio v1.4</title>
+<title>Divin Gangbo — Portfolio v1.5</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
@@ -204,7 +204,7 @@ footer{padding:2rem 2.5rem;border-top:0.5px solid #1a1a1a;display:flex;justify-c
 <div id="manage-banner">Manage mode active — drag ⠿ to reorder, × to remove, or use the panel to add photos.</div>
 
 <nav>
-  <div class="nav-logo"><span id="nav-name">Divin Gangbo</span> <span id="pf-sync-dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#999;margin-left:4px;vertical-align:middle;cursor:help;" title="Sync status"></span><span style="font-size:0.6rem;color:#444;letter-spacing:0.08em;margin-left:8px;vertical-align:middle;font-weight:400;">v1.4</span></div>
+  <div class="nav-logo"><span id="nav-name">Divin Gangbo</span> <span id="pf-sync-dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#999;margin-left:4px;vertical-align:middle;cursor:help;" title="Sync status"></span><span style="font-size:0.6rem;color:#444;letter-spacing:0.08em;margin-left:8px;vertical-align:middle;font-weight:400;">v1.5</span></div>
   <div class="nav-links">
     <a href="#about">About</a><a href="#gallery">Portfolio</a><a href="#contact">Contact</a>
   </div>
@@ -308,7 +308,7 @@ footer{padding:2rem 2.5rem;border-top:0.5px solid #1a1a1a;display:flex;justify-c
 <footer>
   <span class="footer-copy" id="footer-copy">© 2025 Divin Gangbo. All rights reserved.</span>
   <div class="footer-links"><a href="https://instagram.com/Dnice_baby">Instagram</a><a href="#">Press</a></div>
-  <div style="font-size:0.65rem;color:#333;margin-top:0.5rem;letter-spacing:0.08em;">v1.4 — Bulk upload error visibility</div>
+  <div style="font-size:0.65rem;color:#333;margin-top:0.5rem;letter-spacing:0.08em;">v1.5 — Bulk upload error visibility</div>
 </footer>
 
 <div id="pw-modal">
@@ -330,6 +330,11 @@ footer{padding:2rem 2.5rem;border-top:0.5px solid #1a1a1a;display:flex;justify-c
     <button class="panel-close" onclick="toggleManage()">×</button>
   </div>
   <div class="panel-body">
+    <div class="panel-section" style="display:flex;gap:0.5rem;">
+      <button class="btn-add" onclick="pfSyncPush()" style="background:#1a1a1a;color:#aaa;border:0.5px solid #333;">↑ Push to server</button>
+      <button class="btn-add" onclick="pfSyncPull()" style="background:#1a1a1a;color:#aaa;border:0.5px solid #333;">↓ Pull from server</button>
+    </div>
+    <hr class="panel-divider">
     <div class="panel-section">
       <span class="panel-label">Profile details</span>
       <input class="panel-input" id="edit-name" value="Divin Gangbo">
@@ -439,21 +444,37 @@ function _pfSyncToServer() {
 
 function _pfSyncFromServer() {
   if (!PF_API) { _pfSyncReady = true; return Promise.resolve(); }
-  return fetch(PF_API + '/data', { signal: AbortSignal.timeout(5000) })
+  _pfSyncDot('#f0c040', 'Syncing\u2026');
+  return fetch(PF_API + '/data', { signal: AbortSignal.timeout(8000) })
     .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
     .then(function(data) {
-      var keys = Object.keys(data);
-      if (keys.length > 0) {
-        keys.forEach(function(k) { localStorage.setItem(k, data[k]); });
-        console.log('Portfolio: synced ' + keys.length + ' keys from server.');
+      var pfKeys = Object.keys(data).filter(function(k){ return k.indexOf('pf_')===0; });
+      if (pfKeys.length > 0) {
+        // Server has portfolio data \u2014 load it
+        pfKeys.forEach(function(k) { _pfOrigSetItem.call(localStorage, k, data[k]); });
+        console.log('Portfolio: loaded ' + pfKeys.length + ' keys from server.');
         _pfSyncDot('#2d7a3a', 'Synced \u2713');
       } else {
-        _pfSyncDot('#2d7a3a', 'Connected');
+        // Server has no portfolio data \u2014 push local data up
+        console.log('Portfolio: server empty, pushing local data up.');
+        _pfSyncDot('#f0c040', 'Uploading\u2026');
+        var localData = _pfGetAllData();
+        if (Object.keys(localData).length > 0) {
+          return fetch(PF_API + '/data', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(localData)
+          }).then(function(r2) {
+            _pfSyncDot(r2.ok ? '#2d7a3a' : '#c0392b', r2.ok ? 'Pushed \u2713' : 'Push failed');
+          });
+        } else {
+          _pfSyncDot('#2d7a3a', 'Connected');
+        }
       }
     })
     .catch(function(e) {
       console.log('Server unavailable, using local data:', e.message);
-      _pfSyncDot('#c0392b', 'Offline');
+      _pfSyncDot('#c0392b', 'Offline \u2014 changes local only');
     })
     .then(function() { _pfSyncReady = true; });
 }
@@ -1122,4 +1143,3 @@ document.addEventListener('keydown',function(e){
 </script>
 </body>
 </html>
-  
