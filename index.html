@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Divin Gangbo — Portfolio v2.0</title>
+<title>Divin Gangbo — Portfolio v2.1</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
@@ -204,7 +204,7 @@ footer{padding:2rem 2.5rem;border-top:0.5px solid #1a1a1a;display:flex;justify-c
 <div id="manage-banner">Manage mode active — drag ⠿ to reorder, × to remove, or use the panel to add photos.</div>
 
 <nav>
-  <div class="nav-logo"><span id="nav-name">Divin Gangbo</span> <span id="pf-sync-dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#999;margin-left:4px;vertical-align:middle;cursor:help;" title="Sync status"></span><span style="font-size:0.6rem;color:#444;letter-spacing:0.08em;margin-left:8px;vertical-align:middle;font-weight:400;">v2.0</span></div>
+  <div class="nav-logo"><span id="nav-name">Divin Gangbo</span> <span id="pf-sync-dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#999;margin-left:4px;vertical-align:middle;cursor:help;" title="Sync status"></span><span style="font-size:0.6rem;color:#444;letter-spacing:0.08em;margin-left:8px;vertical-align:middle;font-weight:400;">v2.1</span></div>
   <div class="nav-links">
     <a href="#about">About</a><a href="#gallery">Portfolio</a><a href="#contact">Contact</a>
   </div>
@@ -308,7 +308,7 @@ footer{padding:2rem 2.5rem;border-top:0.5px solid #1a1a1a;display:flex;justify-c
 <footer>
   <span class="footer-copy" id="footer-copy">© 2025 Divin Gangbo. All rights reserved.</span>
   <div class="footer-links"><a href="https://instagram.com/Dnice_baby">Instagram</a><a href="#">Press</a></div>
-  <div style="font-size:0.65rem;color:#333;margin-top:0.5rem;letter-spacing:0.08em;">v2.0 — Remove sea/beach photos from baseline; 39 clean portfolio photos</div>
+  <div style="font-size:0.65rem;color:#333;margin-top:0.5rem;letter-spacing:0.08em;">v2.1 — Blacklist: beach/sea photos purged from localStorage on every load</div>
 </footer>
 
 <div id="pw-modal">
@@ -1097,10 +1097,41 @@ document.addEventListener('keydown',function(e){
   if(e.key==='ArrowRight') lightboxNav(1);
 });
 
+// ─── BLACKLIST: URLs that must never appear regardless of localStorage/server ──
+var BLACKLISTED_URLS = [
+  'kce6cxjs8o3v6afmopk5',
+  'sr7vd4xzsx6chdlqkpai',
+  'h6zxcw9t7cie8fcawaps',
+  'fgvjtfykydcbb8o1irns',
+  'bi7ft0nreplba6xdwutj',
+  'cp7i34ec2cawajfmipxr',
+  'ekyty1xj2fnhswmxf1wi'
+];
+function _pfCleanBlacklist() {
+  var raw = localStorage.getItem('pf_photos');
+  if (!raw) return false;
+  var arr;
+  try { arr = JSON.parse(raw); } catch(e) { return false; }
+  var clean = arr.filter(function(p) {
+    return !p.src || !BLACKLISTED_URLS.some(function(id) { return p.src.indexOf(id) !== -1; });
+  });
+  if (clean.length < arr.length) {
+    localStorage.setItem('pf_photos', JSON.stringify(clean));
+    console.log('Removed ' + (arr.length - clean.length) + ' blacklisted photo(s) from localStorage');
+    return true;
+  }
+  return false;
+}
+
 // ─── BOOT: sync from server first, then restore state and render ─────
 (function boot() {
+  _pfCleanBlacklist(); // remove unwanted photos from localStorage before anything else
   _pfSyncFromServer().then(function() {
     _pfRestoreState();
+    _pfCleanBlacklist(); // run again after restore in case server had them
+    photos = photos.filter(function(p) {
+      return !p.src || !BLACKLISTED_URLS.some(function(id) { return p.src.indexOf(id) !== -1; });
+    });
     renderGallery();
     if(typeof renderSlotList==='function') renderSlotList();
     if(typeof renderCanvas==='function') renderCanvas();
